@@ -1,0 +1,11 @@
+#TeX build junk
+*.aux
+*.lof
+*.log
+*.lot
+*.toc
+
+#Output
+*.dvi
+*.pdf
+*.ps
