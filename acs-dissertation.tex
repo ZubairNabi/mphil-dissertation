@@ -55,12 +55,56 @@ in Data Intensive Computing}
 \setcounter{page}{1} 
 
 Over the course of the last decade, proliferation in web applications (Facebook,
-Twitter etc.), distributed file systems~\cite{Ghemawat:2003:GFS}, structured and
+Twitter etc.), and scientific computing (sensor networks, high energy physics,
+etc.) has resulted in an unparalleled surge in data on the exabyte scale.
+Naturally, the need to store and analyze this data has engendered an ecosystem
+of distributed file systems~\cite{Ghemawat:2003:GFS}, structured and
 unstructured data stores~\cite{Chang:2006:BDS,DeCandia:2007:DAH}, and
 data-intensive computing
-frameworks~\cite{Dean:2004:MSD,Isard:2007:DDD,Murray:2011:CUE} for commercial,
-educational, and scientific purposes has lead to the establishment of massive
-data centers with tens of thousands of servers and network elements.
+frameworks~\cite{Dean:2004:MSD,Isard:2007:DDD,Murray:2011:CUE}. These
+``shared-nothing'' frameworks are mostly run in massive data centers with tens
+of thousands of servers and network elements. 
+
+Typically, data centers are built using commodity off-the-shelf
+ servers and switches to find a sweet spot between performance and
+cost~\cite{Barroso:2003:WSP}. Servers in this model store or process a
+\emph{chunk} of data with redundancy ensured via replication without any
+cluster/data center wide memory or SAN. Due to their commodity nature, servers
+and network elements are failure-prone and a failure in say, a \emph{core
+switch} can bring down the entire network. Therefore, storage and processing
+frameworks use a range of methods to deal with this, such as replication,
+re-execution, speculative execution, etc. The network infrastructure
+predominantly consists of wired links cheap switches with shared memory,
+although wireless~\cite{Halperin:2011:ADC} and
+optical~\cite{Wang:2010:CPO,Farrington:2010:HHE} links have recently been
+explored. Most data centers are provisioned with 1Gbps and 10Gbps switches with
+L2 Ethernet switched fabric interconnects as opposed to fabrics from the high
+performance computing community such as InfiniBand. Likewise, due to the
+prohibitive cost of high-end switches and routers, bandwidth is a constrained
+resource in the data center. In the cluster hierarchy, bandwidth increases from
+the edge of the network towards the core (off-rack oversubscription).
+
+The emergence of cloud computing has resulted in multi-tenant data centers in
+which user applications have wide-varying requirements and communication
+patterns. Applications range from low-latency query jobs to bandwidth hungry
+batch processing jobs~\cite{Alizadeh:2010:DCT}. In addition, applications
+exhibit one-to-many, many-to-one, many-to-many communication patterns. On the
+data center fabric level, to ensure better fault-tolerance, scalability, and
+end-to-end bandwidth, several new
+topologies~\cite{Al-Fares:2008:SCD,Guo:2008:DSF,Guo:2009:BHP,Greenberg:2009:VSF}
+have been proposed to replace the status quo: a hierarchical 2/3-level tree
+which connects end-hosts through \emph{top-of-rack} (or \emph{aggregation}), and
+\emph{core} switches. In the same vein,
+L2~\cite{Mudigonda:2010:SCD,Vattikonda:2012:PTD} and
+L3~\cite{Alizadeh:2010:DCT,Vasudevan:2009:SEF,Raiciu:2010:DCN,Wilson:2011:BNL,Wu:2010:IIC}
+protocols, topologies and design
+frameworks~\cite{Singla:2011:JND,Al-Fares:2008:SCD,Guo:2008:DSF,Guo:2009:BHP,Greenberg:2009:VSF,Mudigonda:2011:TFC,Chen:2010:GAA},
+and control and virtualization
+planes~\cite{NiranjanMysore:2009:PSF,Mudigonda:2011:NSM,Guo:2010:SDC,Ballani:2011:TPD,Shieh:2011:SDC,Rodrigues:2011:GSB,Al-Fares:2010:HDF}
+for data center communication and resource allocation have also experienced
+innovation for varying goals picked from a set of high bandwidth, fairness,
+fault-tolerance, and scalability.
+
 
 This is the introduction where you should introduce your work.  In
 general the thing to aim for here is to describe a little bit of the
@@ -139,6 +183,8 @@ how well you write, you may not need a summary here.
 You will generally want to draw some conclusions, and point
 to potential future work. 
 
+Possibly merge with Mesos~\cite{Hindman:2011:MPF} and
+Akaros~\cite{Rhoden:2011:IPE}.
 
 
 
