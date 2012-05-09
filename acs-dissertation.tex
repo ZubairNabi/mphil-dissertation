@@ -16,14 +16,15 @@
 %% EDIT THE BELOW TO CUSTOMIZE
 %%
 
-\def\authorname{Sarah J.\ Jones\xspace}
-\def\authorcollege{Wolfson College\xspace}
-\def\authoremail{Sarah.Jones@cl.cam.ac.uk}
-\def\dissertationtitle{Type-Safety for Embedded Systems}
+\def\authorname{Zubair Nabi\xspace}
+\def\authorcollege{Robinson College\xspace}
+\def\authoremail{Zubair.Nabi@cl.cam.ac.uk}
+\def\dissertationtitle{Mission Control: Enabling Efficient and Heterogeneous Data Transfers
+in Data Intensive Computing}
 \def\wordcount{14,235}
 
 
-\usepackage{epsfig,graphicx,parskip,setspace,tabularx,xspace} 
+\usepackage{epsfig,graphicx,parskip,setspace,tabularx,xspace,epstopdf} 
 
 %% START OF DOCUMENT
 \begin{document}
@@ -52,6 +53,14 @@
 \chapter{Introduction}
 \pagenumbering{arabic} 
 \setcounter{page}{1} 
+
+Over the course of the last decade, proliferation in web applications (Facebook,
+Twitter etc.), distributed file systems~\cite{Ghemawat:2003:GFS}, structured and
+unstructured data stores~\cite{Chang:2006:BDS,DeCandia:2007:DAH}, and
+data-intensive computing
+frameworks~\cite{Dean:2004:MSD,Isard:2007:DDD,Murray:2011:CUE} for commercial,
+educational, and scientific purposes has lead to the establishment of massive
+data centers with tens of thousands of servers and network elements.
 
 This is the introduction where you should introduce your work.  In
 general the thing to aim for here is to describe a little bit of the
@@ -137,6 +146,6 @@ to potential future work.
 \singlespacing
 
 \bibliographystyle{unsrt} 
-%\bibliography{dissertation} 
+\bibliography{dissertation} 
 
 \end{document}

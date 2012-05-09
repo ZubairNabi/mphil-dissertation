@@ -13,3 +13,7 @@
 #Eclipse/TeXlipse junk
 *.project
 *.texlipse
+
+#BibTeX junk
+*.bbl
+*.blg
