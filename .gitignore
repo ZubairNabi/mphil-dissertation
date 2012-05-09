@@ -9,3 +9,7 @@
 *.dvi
 *.pdf
 *.ps
+
+#Eclipse/TeXlipse junk
+*.project
+*.texlipse
