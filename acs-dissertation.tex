@@ -63,40 +63,55 @@ unstructured data stores~\cite{Chang:2006:BDS,DeCandia:2007:DAH}, and
 data-intensive computing
 frameworks~\cite{Dean:2004:MSD,Isard:2007:DDD,Murray:2011:CUE}. These
 ``shared-nothing'' frameworks are mostly run in massive data centers with tens
-of thousands of servers and network elements. 
+of thousands of servers and network elements. These data centers are
+geo-located, for diversity and redundancy, and run a wide-variety of loads,
+including user-facing applications, such as email, custom enterprise
+applications, such as authentication services, and large-scale batch-processing
+applications, such as web indexing~\cite{Benson:2010:NTC}. The goal of each data
+center is to provide multi-tenant environments for energy, power, space, and
+cost-efficient computation, and storage at scale~\cite{Katz:2009:TTB}.
 
-Typically, data centers are built using commodity off-the-shelf
- servers and switches to find a sweet spot between performance and
-cost~\cite{Barroso:2003:WSP}. Servers in this model store or process a
-\emph{chunk} of data with redundancy ensured via replication without any
-cluster/data center wide memory or SAN. Due to their commodity nature, servers
-and network elements are failure-prone and a failure in say, a \emph{core
-switch} can bring down the entire network. Therefore, storage and processing
-frameworks use a range of methods to deal with this, such as replication,
-re-execution, speculative execution, etc. The network infrastructure
-predominantly consists of wired links cheap switches with shared memory,
-although wireless~\cite{Halperin:2011:ADC} and
+Typically, data centers are built using commodity, off-the-shelf servers and
+switches to find a sweet spot between performance and cost and leverage
+economies of scale~\cite{Barroso:2003:WSP}. Servers in this model, store or
+process a \emph{chunk} of data, with redundancy ensured via replication without
+any cluster/data center wide memory or storage area network (SAN). Due to their
+commodity nature, servers and network elements are failure-prone and a failure
+in say, a \emph{core switch} can bring down the entire network. Therefore,
+storage and processing frameworks use a range of methods to deal with this,
+including replication, re-execution, speculative execution. On the network side,
+the infrastructure predominantly consists of TCP/IP enabled wired links
+connecting cheap switches with shared memory, although
+wireless~\cite{Halperin:2011:ADC} and
 optical~\cite{Wang:2010:CPO,Farrington:2010:HHE} links have recently been
 explored. Most data centers are provisioned with 1Gbps and 10Gbps switches with
 L2 Ethernet switched fabric interconnects as opposed to fabrics from the high
 performance computing community such as InfiniBand. Likewise, due to the
 prohibitive cost of high-end switches and routers, bandwidth is a constrained
-resource in the data center. In the cluster hierarchy, bandwidth increases from
-the edge of the network towards the core (off-rack oversubscription).
+resource in the data center. To ensure optimum utilization, subject to
+organizational goals, oversubscription factors\footnote{Oversubscription factor
+can simply be defined as the amount of bandwidth seen by a particular
+application as opposed to the total available
+bandwidth~\cite{Al-Fares:2008:SCD}.} in real data centers vary significantly:
+Some are as low as 2:1 while some can get as high as
+147:1~\cite{Benson:2010:NTC}. In the cluster hierarchy, bandwidth increases from
+the edge of the network towards the core (off-rack oversubscription). As a
+result of off-rack oversubscription, applications are designed to keep
+cross-rack communication to a minimal~\cite{Dean:2004:MSD}.
 
-The emergence of cloud computing has resulted in multi-tenant data centers in
-which user applications have wide-varying requirements and communication
-patterns. Applications range from low-latency query jobs to bandwidth hungry
-batch processing jobs~\cite{Alizadeh:2010:DCT}. In addition, applications
-exhibit one-to-many, many-to-one, many-to-many communication patterns. On the
-data center fabric level, to ensure better fault-tolerance, scalability, and
-end-to-end bandwidth, several new
+Concurrently, the emergence of cloud computing has resulted in multi-tenant data
+centers in which user applications have wide-varying requirements and
+communication patterns. Applications range from low-latency query jobs to
+bandwidth hungry batch processing jobs~\cite{Alizadeh:2010:DCT}. In addition,
+applications exhibit one-to-many, many-to-one, many-to-many communication
+patterns. On the data center fabric level, to ensure better fault-tolerance,
+scalability, and end-to-end bandwidth, several new
 topologies~\cite{Al-Fares:2008:SCD,Guo:2008:DSF,Guo:2009:BHP,Greenberg:2009:VSF}
 have been proposed to replace the status quo: a hierarchical 2/3-level tree
 which connects end-hosts through \emph{top-of-rack} (or \emph{aggregation}), and
 \emph{core} switches. In the same vein,
 L2~\cite{Mudigonda:2010:SCD,Vattikonda:2012:PTD} and
-L3~\cite{Alizadeh:2010:DCT,Vasudevan:2009:SEF,Raiciu:2010:DCN,Wilson:2011:BNL,Wu:2010:IIC}
+L3/L4~\cite{Alizadeh:2010:DCT,Vasudevan:2009:SEF,Raiciu:2010:DCN,Wilson:2011:BNL,Wu:2010:IIC}
 protocols, topologies and design
 frameworks~\cite{Singla:2011:JND,Al-Fares:2008:SCD,Guo:2008:DSF,Guo:2009:BHP,Greenberg:2009:VSF,Mudigonda:2011:TFC,Chen:2010:GAA},
 and control and virtualization
@@ -105,6 +120,107 @@ for data center communication and resource allocation have also experienced
 innovation for varying goals picked from a set of high bandwidth, fairness,
 fault-tolerance, and scalability.
 
+Above all, the ossification of the Internet protocol stack at the transport and
+network layer~\cite{Akhshabi:2011:ELP} has also been mimicked by data center
+networks. TCP/IP has become the de-facto ``narrow-waist" of the data center
+network. On the one hand, this has standardized direct communication to/from and
+within the data center without any middleware, but on the other, it has also
+spawned a new set of problems unique to the data center environment. In the data
+center, the role of IP at the network layer is minimal, as it is only employed
+for naming and addressing. The only obstacle is address assignment which needs
+to be done manually to encode location/topology information within the address.
+Although, manual assignment is tedious and error-prone, it can be automated by
+leveraging the well-defined structure of data centers~\cite{Chen:2010:GAA}. In
+contrast, TCP faces a number of pathological challenges due to a significantly
+different bandwidth-delay product, round-trip time (RTT), and retransmission
+timeout (RTO)~\cite{Chen:2009:UTI} than a wide area network (WAN). For example,
+due to the low RTT, the congestion window for each flow is very small. As a
+result, flow recovery through TCP fast retransmit is impossible, leading to poor
+net throughput~\cite{Kandula:2009:NDC}. To exacerbate problems, data-intensive
+computing frameworks (DICF) are bandwidth hungry and require all data to be
+\emph{materialized} before the next stage can commence (For example,
+\emph{shuffle} between Map and Reduce stages). In fact, data transfer between
+stages can account for more than 50\% of the job completion
+time~\cite{Chowdhury:2011:MDT}. Similar to compute, memory, and disk I/O
+``stragglers''~\cite{Zaharia:2008:IMP}, an imbalance in network efficiency can
+lead to the job completion time being dictated by the task with the longest
+shuffle time.
+
+It is important to highlight that some of these problems stated above, stem in
+part due to the difference in traffic characteristics and scale between data
+centers and other networks. In addition, unlike wide area network applications,
+there is a tight coupling between an application's usage of network, computing,
+and storage resources. In production data centers, due to wide-varying mix of
+applications, congestion in the network can last from 10s to 100s of
+seconds~\cite{Kandula:2009:NDC}. Moreover, during high utilization periods, the
+task failure rate of batch-processing systems increases, especially during the
+\emph{reduce} phase of MapReduce-style applications, by a median value of 1.1x,
+due to read failures over the network. In the worst case, this can halt the
+entire job if subsequent tasks are dependent on the failed ones. Furthermore,
+link utilization is highest in the core of the network, but most losses occur
+towards the edge~\cite{Benson:2010:NTC}. Additionally, in some cases
+over-provisioning the network is overkill and good performance can be achieved
+by adding a few extra links at hotspot points~\cite{Kandula:2009:FTD}. Finally,
+in commodity switches the buffer pool is shared by all interfaces. As a result
+if long flows hog the memory, there will be queue build up in the short flows.
+In reaction, TCP reduces the window size by half based on the presence of
+congestion regardless of its extent. This leads to a large mismatch between the
+input rate and the capacity of the link leading to buffer underflows and loss of
+throughput~\cite{Alizadeh:2010:DCT}. Overall, traffic engineering in the data
+center is a complex task due to the wide variability in flow duration, flow
+size, flow arrival time, and server participation~\cite{Kandula:2009:NDC}, and
+standard TCP without any global knowledge is suboptimal~\cite{Benson:2010:NTC}
+[Look up citation].
+
+Another major shortcoming of TCP which is enunciated in the data center is
+\emph{Incast}~\cite{Chen:2009:UTI,Vasudevan:2009:SEF,Wu:2010:IIC,Alizadeh:2010:DCT}.
+As a result of which, the overall application goodput significantly goes down.
+Typically, to handle incast, application level remedies are added which include
+varying the size of the packets so that a large number of packets can fit the
+switch memory, and adding application-level jitter to offset the packet
+inter-arrival time. Both of these solutions are suboptimal, as they either,
+increase the number of packets, or add unnecessary
+delay~\cite{Alizadeh:2010:DCT}.
+
+TCP was designed for a wide area network (WAN).
+
+Therefore, in recent years, a number of reverse-engineered versions of TCP have
+been proposed. Unfortunately, most solutions are tied either to the underlying
+topology or the traffic mix of the data center. There is no one-size-fits-all
+solution. Therefore, there needs to be a decoupling between data transfer policy
+and mechanism. The same strategy when applied at the network layer improves both
+application-level and network-level performance~\cite{Abu-Libdeh:2010:SRF}. In
+addition to improving performance, transport layer characteristics an also be
+chosen to improve energy efficiency~\cite{Heller:2010:ESE} or
+security~\cite{bittau:the}. Adding power constraints can greatly reduce the
+consumption footprint of today's data centers where the network consumes 10-20\%
+of the total power~\cite{Greenberg:2008:CCR}.
+Likewise, application traffic can transparently and
+efficiently~\cite{bittau:the} be encrypted to ensure security in a multi-tenant
+environment.
+
+
+Existing solutions which ensure fairness and high bandwidth, work at the flow or
+packet level which does not capture the needs of DICF where the unit of
+communication is a \emph{transfer}.
+Put differently, stages between DICF are dependent on bulk \emph{transfers} of
+data. A recent system, Orchestra~\cite{Chowdhury:2011:MDT}, works at the
+application layer to enable intra and inter-transfer control of two
+communication patterns, which lie at the heart of DICF: \emph{shuffles}, and
+\emph{broadcasts}. For the former it uses weighted flow assignment (WFA) enabled
+by an appropriate number of multiple TCP connections and TCP's AIMD fair sharing
+while for the latter it leverages a BitTorrent-like algorithm. While the results
+from Orchestra are promising, it suffers from a number of shortcomings. Most
+notably, using single-flow TCP for WFA is suboptimal due to TCP's inefficiency
+in (a) moving away from congested links, and (b) exploiting denseness of
+interconnection in advanced
+topologies~\cite{Al-Fares:2008:SCD,Guo:2008:DSF,Guo:2009:BHP,Greenberg:2009:VSF}
+as noted by Raiciu et al.~\cite{Raiciu:2011:IDP}. In addition, some applications
+might not require TCP and could possibly benefit from other transport
+protocols~\cite{bittau:the,Alizadeh:2010:DCT,Vasudevan:2009:SEF,Raiciu:2010:DCN,Wilson:2011:BNL}.
+Finally, frameworks like Dryad support TCP pipes, and shared memory FIFO for
+communication in addition to transfer of files over the network, while Orchestra
+only considers the last of these.
 
 This is the introduction where you should introduce your work.  In
 general the thing to aim for here is to describe a little bit of the
@@ -137,6 +253,65 @@ the rest of the dissertation.
 
 
 \chapter{Related Work} 
+
+Because of the shared nature of the new topologies the full bisection bandwidth
+is not available[cite Hedara/Camdoop]? They also increase the overall cost and
+wiring complexity.
+
+CamCube proposes a 3D torus topology in which each server is directly connected
+to a small set of other servers inspired by structured
+overlays~\cite{Abu-Libdeh:2010:SRF}. This scheme places each server into a 3D
+wrapped coordinate space and its position (\emph{x,y,z}) in the space represents
+its address. As a result, the physical and virtual topology of the network is
+the same and applications can infer their location through an API which exposes
+coordinate space information and allows one-hop Ethernet packets. Thus,
+applications can implement their own routing strategies. Mission Control can be
+used on CamCube to enable applications to choose both their routing strategies
+and their transport mechanism.
+
+\section{Reducing Network Traffic}
+Another point in the design space is the reduce the amount of traffic that is
+transferred across the network by MapReduce-like
+systems~\cite{Costa:2012:CEI,Yu:2009:DAD}. This can be done, either at different
+levels in the cluster topology~\cite{Yu:2009:DAD} or made a function of the
+network itself as in Camdoop~\cite{Costa:2012:CEI}. On the downside, performing
+rack-level aggregation can saturate the ingress link to the aggregating
+server~\cite{Yu:2009:DAD}. This \emph{distributed combiner} approach is most
+effective for MapReduce functions which are commutative and
+associative~\cite{Dean:2004:MSD}. For other function types, Camdoop distributes
+the implicit sort and merge of MapReduce across all servers. At the same time, a
+custom transport layer performs global scheduling of packets. This solution is
+only applicable to a CamCube topology but shows that custom transport protocols
+can greatly enhance performance.
+
+\section{Wireless and Optical Networks}
+Another line of work has argued that providing full-bisection links throughout
+the network is overkill as only a few hotspots exist in actual data
+centers~\cite{{Halperin:2011:ADC,Kandula:2009:FTD}}. The high cost and technical
+challenges of newer topologies can be avoided by provisining the network for the
+average case and avoiding hotspots by adding additional links on the fly.
+The key challenge is to choose the placement and duration of \emph{flyways}.
+Flyways are constructed using Multi-Gigabit wireless links, controlled by a
+centralized scheduler that decides the temporal and spatial placement of
+wireless links based on observed traffic. In cases where the traffic has high
+churn, the controller would fail to respond quickly.
+
+\section{Energy Efficiency and Security}
+ElasticTree is a system that dynamically alters the power consumption of
+networking elements inside a data center based on the current
+traffic~\cite{Heller:2010:ESE}. It consists of an optimizer, routing control,
+and power control. Based on the topology, traffic matrix, other inputs, the
+optimizer computes an optimum power network subnet which is in turn fed to the
+power control and the routing control. The former toggles the power state of
+network elements, and the latter chooses paths for each flow. The optimizer
+provides a number of strategies which make a trade-off between scalability, and
+optimality. ElasticTree can be used in conjunction with Mission Control to
+choose an underlying transport protocol that behaves well with it. For example,
+the performance of TCP is adversely affected if there is packet reordering due
+to the splitting for a single flow across multiple links by ElasticTree.
+
+TCPcrypt is an enhancement of TCP that uses 
+
 
 This chapter covers relevant (and typically, recent) research 
 which you build upon (or improve upon). There are two complementary 
@@ -184,7 +359,7 @@ You will generally want to draw some conclusions, and point
 to potential future work. 
 
 Possibly merge with Mesos~\cite{Hindman:2011:MPF} and
-Akaros~\cite{Rhoden:2011:IPE}.
+Akaros~\cite{Rhoden:2011:IPE} or Quincy~\cite{Isard:2009:QFS}.
 
 
 
