@@ -120,6 +120,7 @@ for data center communication and resource allocation have also experienced
 innovation for varying goals picked from a set of high bandwidth, fairness,
 fault-tolerance, and scalability.
 
+\section{The Case Against TCP in the Data Center}
 Above all, the ossification of the Internet protocol stack at the transport and
 network layer~\cite{Akhshabi:2011:ELP} has also been mimicked by data center
 networks. TCP/IP has become the de-facto ``narrow-waist" of the data center
@@ -187,14 +188,17 @@ adoption in environments as diverse as satellites~\cite{Henderson:1999:TPF}.
 This is primarily due to TCP's ability to provide reliability, congestion and
 flow control, and in-order packet delivery.
 Moreover, its maturity makes it a ``kitchen sink'' solution for
-developers~\cite{Vasudevan:2009:SEF}. Naturally, it is the transport of choice
-for the data center. But it is clear from the discussion above that TCP is
-sub-optimal in a data center environment -- A fact agreed upon universally by
-researchers. Therefore, in recent years, a number of reverse-engineered versions
-of TCP have been
+developers~\cite{Vasudevan:2009:SEF}. Naturally, it has become the transport of
+choice for the data center. But it is clear from the discussion above that TCP
+is sub-optimal in a data center environment -- A fact agreed upon universally by
+researchers. As a result, in recent years, a number of reverse-engineered
+versions of TCP have been
 proposed~\cite{Alizadeh:2010:DCT,Wu:2010:IIC,Wilson:2011:BNL,Vasudevan:2009:SEF,Chen:2009:UTI}.
 Unfortunately, most solutions are tied either to the underlying topology or the
 traffic mix of the data center. There is no one-size-fits-all solution.
+
+\section{Augmenting the Narrow-waist of the Data Center}
+
 Therefore, there needs to be a decoupling between data transfer policy and
 mechanism. The same strategy when applied at the network layer improves both
 application-level and network-level performance~\cite{Abu-Libdeh:2010:SRF}. In
@@ -277,7 +281,51 @@ used on CamCube to enable applications to choose both their routing strategies
 and their transport mechanism.
 
 \section{Transport Protocols}
+Data Center TCP (DCTCP)~\cite{Alizadeh:2010:DCT} uses Explicit Congestion
+Notifications (ECN) from switches to perform active queue management based
+congestion control. Specifically, it uses the congestion experienced flag in
+packets--set by switches whenever the buffer occupancy exceeds a small
+threshold--to reduce the size of the window based on a fraction of the marked
+packets. This enables DCTCP to react quickly reach to queue buildup and avoid
+buffer pressure. DCTCP can only work in a network with ECN-compatible switches.
+Therefore, Mission Control enables DCTCP if it detects that switches in the
+network support ECN.
+
+
+Structured Stream Transport (SST)~\cite{Ford:2007:SSN} finds the middle-ground
+between stream and datagram transmission. It implements a hierarchical and
+hereditary stream structure, that allows applications to create substreams from
+existing streams without incurring startup and tear-down delay. Substreams
+operate independently with their own data transfer and flow control. To ensure
+inter-stream fairness, substreams share congestion control. Moreover,
+``ephemeral streams'' can be used to enable datagram transmission. Finally,
+applications can prioritize their streams on the fly depending on runtime
+requirements. Mission Control can use SST to enable MapReduce-like systems to
+prioritize their data transfers, by opening multiple substreams, and to send
+lightweight control traffic using ephemeral streams.
+
 \subsection{Incast}
+Vasudevan et al.~\cite{Vasudevan:2009:SEF} propose increase the granularity of
+kernel timers to enable microsecond granularity RTT estimation, which is turn
+used to set the RTO. They shows that reducing the RTO can increase the goodput
+of simultaneous connections and hence negate Incast. Further, making
+retransmissions random, can also increase the goodput by stopping multiple flows
+from timings out, backing off, and retransmitting simultaneously. The takeaway
+lesson is that to avoid Incast in low-latency data center networks, RTOs should
+be on the same scale as network latency. Chen et al.~\cite{Chen:2009:UTI}
+complement the analysis of the previous work by defining an analytical model for
+Incast. This model shows that goodput is affected by both the minimum RTO timer
+value and the inter-packet wait time. Unlike, these two solutions which focus on
+post hoc recovery, ICTCP~\cite{Wu:2010:IIC} aims to avoid packet losses before
+Incast manifestation. To this end, ICTCP implements a window based congestion
+control algorithm at the receiver side. Specifically, the available bandwidth at
+the receiver is used as a trigger to perform congestion control.
+The frequency of this control changes dynamically based on the queueing delay
+and is larger than one RTT. Finally, connection throughput is only throttled to
+avoid Incast, not to decrease application goodput. We believe that all of these
+implementations can be used under Mission Control depending on the dynamics
+of the load.
+
 
 \section{Reducing Network Traffic}
 Another point in the design space is the reduce the amount of traffic that is
