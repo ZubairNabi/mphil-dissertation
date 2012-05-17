@@ -169,26 +169,34 @@ input rate and the capacity of the link leading to buffer underflows and loss of
 throughput~\cite{Alizadeh:2010:DCT}. Overall, traffic engineering in the data
 center is a complex task due to the wide variability in flow duration, flow
 size, flow arrival time, and server participation~\cite{Kandula:2009:NDC}, and
-standard TCP without any global knowledge is suboptimal~\cite{Benson:2010:NTC}
-[Look up citation].
+standard TCP without any global knowledge is suboptimal~\cite{Benson:2010:CFT}.
 
 Another major shortcoming of TCP which is enunciated in the data center is
 \emph{Incast}~\cite{Chen:2009:UTI,Vasudevan:2009:SEF,Wu:2010:IIC,Alizadeh:2010:DCT}.
-As a result of which, the overall application goodput significantly goes down.
-Typically, to handle incast, application level remedies are added which include
-varying the size of the packets so that a large number of packets can fit the
-switch memory, and adding application-level jitter to offset the packet
-inter-arrival time. Both of these solutions are suboptimal, as they either,
-increase the number of packets, or add unnecessary
-delay~\cite{Alizadeh:2010:DCT}.
+As a result of which, the overall application throughput significantly goes down
+by up to 90\%~\cite{Vasudevan:2009:SEF}. Typically, to handle incast,
+application level remedies are added which include varying the size of the
+packets so that a large number of packets can fit the switch memory, and adding
+application-level jitter to offset the packet inter-arrival time. Both of these
+solutions are suboptimal, as they either, increase the number of packets, or add
+unnecessary delay~\cite{Alizadeh:2010:DCT}.
 
-TCP was designed for a wide area network (WAN).
-
-Therefore, in recent years, a number of reverse-engineered versions of TCP have
-been proposed. Unfortunately, most solutions are tied either to the underlying
-topology or the traffic mix of the data center. There is no one-size-fits-all
-solution. Therefore, there needs to be a decoupling between data transfer policy
-and mechanism. The same strategy when applied at the network layer improves both
+It is noteworthy that TCP was designed as a general transport mechanism for a
+wide area network (WAN)~\cite{Clark:1988:DPD} and has experienced near universal
+adoption in environments as diverse as satellites~\cite{Henderson:1999:TPF}.
+This is primarily due to TCP's ability to provide reliability, congestion and
+flow control, and in-order packet delivery.
+Moreover, its maturity makes it a ``kitchen sink'' solution for
+developers~\cite{Vasudevan:2009:SEF}. Naturally, it is the transport of choice
+for the data center. But it is clear from the discussion above that TCP is
+sub-optimal in a data center environment -- A fact agreed upon universally by
+researchers. Therefore, in recent years, a number of reverse-engineered versions
+of TCP have been
+proposed~\cite{Alizadeh:2010:DCT,Wu:2010:IIC,Wilson:2011:BNL,Vasudevan:2009:SEF,Chen:2009:UTI}.
+Unfortunately, most solutions are tied either to the underlying topology or the
+traffic mix of the data center. There is no one-size-fits-all solution.
+Therefore, there needs to be a decoupling between data transfer policy and
+mechanism. The same strategy when applied at the network layer improves both
 application-level and network-level performance~\cite{Abu-Libdeh:2010:SRF}. In
 addition to improving performance, transport layer characteristics an also be
 chosen to improve energy efficiency~\cite{Heller:2010:ESE} or
@@ -198,7 +206,6 @@ of the total power~\cite{Greenberg:2008:CCR}.
 Likewise, application traffic can transparently and
 efficiently~\cite{bittau:the} be encrypted to ensure security in a multi-tenant
 environment.
-
 
 Existing solutions which ensure fairness and high bandwidth, work at the flow or
 packet level which does not capture the needs of DICF where the unit of
@@ -269,6 +276,9 @@ applications can implement their own routing strategies. Mission Control can be
 used on CamCube to enable applications to choose both their routing strategies
 and their transport mechanism.
 
+\section{Transport Protocols}
+\subsection{Incast}
+
 \section{Reducing Network Traffic}
 Another point in the design space is the reduce the amount of traffic that is
 transferred across the network by MapReduce-like
@@ -310,8 +320,17 @@ choose an underlying transport protocol that behaves well with it. For example,
 the performance of TCP is adversely affected if there is packet reordering due
 to the splitting for a single flow across multiple links by ElasticTree.
 
-TCPcrypt is an enhancement of TCP that uses 
-
+TCPcrypt is a backwards compatible enhancement to TCP that uses aims to
+efficiently provide encrypted communication, transparently to
+applications~\cite{bittau:the}. To this end, it uses a custom key exchange
+protocol that leverages the TCP options field. Like SSL, to reduce the cost of
+connection setup for short-lived flows, it enables cryptographic state from one
+TCP connection to bootstrap subsequent ones. Even for legacy applications, it
+protects against passive eavesdropping. Additionally, TCPcrypt protects the
+integrity of TCP sessions, and defends against attacks that change their state
+or affect their performance. Finally, applications can also be made aware of the
+presence of TCPcrypt to negate redundant encryption. We use TCPcrypt as a secure
+transport protocol option in Mission Control.
 
 This chapter covers relevant (and typically, recent) research 
 which you build upon (or improve upon). There are two complementary 
