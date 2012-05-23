@@ -319,24 +319,59 @@ multiple inputs and outputs depending on the programming semantics. Finally,
 developers can easily use high-level languages to restrict the programming
 interface for a particular domain.
 
-CIEL~\cite{Murray:2011:CUE}.
+While MapReduce and Dryad are efficient at processing a rich set of applications
+with sequential flow, they fall short of supporting iterative and recursive
+applications~\cite{Bu:2010:HEI,Zaharia:2010:SCC}. In addition, these
+applications, such as \emph{k}-means clustering, PageRank, etc., require a more
+expressive language to define their flow. These problems are addressed by
+CIEL~\cite{Murray:2011:CUE} which includes a language runtime, and execution
+engine, to support large-scale distributed computing. CIEL contains two
+components: 1) A scripting language, \emph{Skywriting}~\cite{Murray:2010:SCS},
+and 2) A distributed execution engine. Skywriting is a Turing-complete language
+that can be used to express data-dependent control flow. It provides primitives
+to loop over expressions or call them recursively. In addition, scripting
+primitives can be used to spawn and execute tasks, and de-reference data
+(reminiscent of pointers in C/C++). Further, it provides library functions to
+express the flow of other frameworks such as MapReduce, as CIEL subsumes both
+MapReduce, and Dryad. Architecturally, CIEL is similar to MapReduce and Dryad,
+in that it also has a single master and several worker nodes, with the former in
+charge of computation state, and the latter in charge of the actual computation.
+CIEL relies on three primitives--objects, references, and tasks--for dynamic
+task graphs. Specifically, objects are data sequences that are used for input,
+and are generated as output. Objects which have not been fully computed yet, can
+be used as references. Further, tasks are the unit of computation and
+scheduling. Tasks use programmatic code, or binaries to execute over all its
+dependencies. Moreover, tasks can either compute all its output objects, or
+alternatively, spawn other tasks to do so. Tasks can be executed in either
+\emph{eager}, or \emph{lazy} fashion, with the latter being the default
+strategy. Finally, CIEL uses a number of optimizations to improve performance
+such as deterministic naming, and streaming.
 
 These frameworks have also spawned high-level
 languages~\cite{Olston:2008:PLN,Pike:2005:IDP,Murray:2010:SCS,Yu:2008:DSG} which
 allow users to write applications which are transparently translated into a
-data-flow plan and scheduled on top of them.
-
-A recent system, Orchestra~\cite{Chowdhury:2011:MDT}, works at the application
-layer to enable intra and inter-transfer control of two communication patterns,
-which lie at the heart of batch processing systems such as MapReduce:
+data-flow plan and scheduled on top of them. In addition, there is a rich body
+of work which aims to reduce the turn around time of these
+systems~\cite{Zaharia:2010:DSS,Isard:2009:QFS,Zaharia:2008:IMP}. While these
+proposals have been successful in improving scheduling and fairness, the network
+utilization of these batch-processing systems has largely been ignored. A recent
+system, Orchestra~\cite{Chowdhury:2011:MDT}, works at the application layer to
+enable intra and inter-transfer control of two communication patterns, which lie
+at the heart of batch processing systems such as MapReduce:
 \emph{shuffles}, and \emph{broadcasts}. For the former it uses weighted flow
 assignment (WFA) enabled by an appropriate number of multiple TCP connections
 and TCP's AIMD fair sharing while for the latter it leverages a BitTorrent-like
-algorithm. While the results from Orchestra are promising, it is still
-suboptimal due to its reliance on TCP. In addition, frameworks like Dryad
-support TCP pipes, and shared memory FIFO for communication in addition to
-transfer of files over the network, while Orchestra only considers the last of
-these.
+algorithm. Architecturally, it is a centralized application layer controller for
+both intra and inter-transfer communication. The former is managed by one or
+more Transfer Controllers (TCs) while the latter is managed by a Inter-transfer
+Controller (ITC). The TC continuously monitors the transfer and updates the set
+of sources associated with each destination. TCs manage the transfer at the
+granularity of flows, by choosing how many concurrent flows to open from each
+node, which destinations to open them to, and when to move each chunk of data.
+While the results from Orchestra are promising, it is still suboptimal due to
+its reliance on TCP. In addition, frameworks like Dryad support TCP pipes, and
+shared memory FIFO for communication in addition to transfer of files over the
+network, while Orchestra only considers the last of these.
 
 \section{Consistency, Replication, Scalability, and Reliability in the
 Cloud}\label{chapter:background:section:consistency}
@@ -397,6 +432,7 @@ applications do not experience the full benefit. In addition, these topologies
 also increase the overall cost and wiring complexity.
 
 \section{Global Schedulers}
+PLayer~\cite{Joseph:2008:PSL}
 
 \section{Transport Protocols}
 D$^3$~\cite{Wilson:2011:BNL}
@@ -449,7 +485,7 @@ of the load.
 ~\cite{Benson:2010:NTC},~\cite{Benson:2009:UDC},~\cite{Kandula:2009:NDC}
 
 \section{Reducing Network Traffic}
-Another point in the design space is the reduce the amount of traffic that is
+Another point in the design space is to reduce the amount of traffic that is
 transferred across the network by MapReduce-like
 systems~\cite{Costa:2012:CEI,Yu:2009:DAD}. This can be done, either at different
 levels in the cluster topology~\cite{Yu:2009:DAD} or made a function of the
