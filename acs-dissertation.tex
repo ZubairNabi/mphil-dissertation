@@ -64,11 +64,11 @@ data-intensive computing
 frameworks~\cite{Dean:2004:MSD,Isard:2007:DDD,Murray:2011:CUE}. These
 ``shared-nothing'' frameworks are mostly run in massive data centers with tens
 of thousands of servers and network elements. These data centers are
-geo-located, for diversity and redundancy, and run a wide-variety of loads,
-including user-facing applications, such as email, custom enterprise
-applications, such as authentication services, and large-scale batch-processing
+geo-located, for diversity and redundancy, and run a wide-variety of loads;
+including user-facing applications, such as email; custom enterprise
+applications, such as authentication services; and large-scale batch-processing
 applications, such as web indexing~\cite{Benson:2010:NTC}. The goal of each data
-center is to provide multi-tenant environments for energy, power, space, and
+center is to provide a multi-tenant environment for energy-, power-, space-, and
 cost-efficient computation, and storage at scale~\cite{Katz:2009:TTB}.
 
 Typically, data centers are built using commodity, off-the-shelf servers and
@@ -97,13 +97,13 @@ Some are as low as 2:1 while some can get as high as
 147:1~\cite{Benson:2010:NTC}. In the cluster hierarchy, bandwidth increases from
 the edge of the network towards the core (off-rack oversubscription). As a
 result of off-rack oversubscription, applications are designed to keep
-cross-rack communication to a minimal~\cite{Dean:2004:MSD}.
+cross-rack communication to a minimum~\cite{Dean:2004:MSD}.
 
 Concurrently, the emergence of cloud computing has resulted in multi-tenant data
 centers in which user applications have wide-varying requirements and
 communication patterns. Applications range from low-latency query jobs to
 bandwidth hungry batch processing jobs~\cite{Alizadeh:2010:DCT}. In addition,
-applications exhibit one-to-many, many-to-one, many-to-many communication
+applications exhibit one-to-many, many-to-one, and many-to-many communication
 patterns. On the data center fabric level, to ensure better fault-tolerance,
 scalability, and end-to-end bandwidth, several new
 topologies~\cite{Al-Fares:2008:SCD,Guo:2008:DSF,Guo:2009:BHP,Greenberg:2009:VSF}
@@ -148,7 +148,7 @@ Similar to compute, memory, and disk I/O ``stragglers''~\cite{Zaharia:2008:IMP},
 an imbalance in network efficiency can lead to the job completion time being
 dictated by the task with the longest shuffle time.
 
-It is important to highlight that some of these problems stated above, stem in
+It is important to highlight that some of the problems stated above, stem in
 part due to the difference in traffic characteristics and scale between data
 centers and other networks. In addition, unlike wide area network applications,
 there is a tight coupling between an application's usage of network, compute,
@@ -188,14 +188,16 @@ in a virtualized environment where a single host runs tens of virtual machines
 each VM, which can be orders of magnitude higher than the RTT between hosts
 inside a data center~\cite{Gamage:2011:OFI,Kangarlou:2010:VIT}. This
 significantly slows down the progress of TCP connections between different
-applications.
+applications. So much so that there are periods where TCP throughput can go down
+to zero~\cite{Wang:2010:IVN}.
 
-For completeness, it is noteworthy that TCP was designed as a general transport
-mechanism for a wide area network (WAN)~\cite{Clark:1988:DPD} and has
+All of these problems have even prompted large-scale deployments to abandon TCP
+altogether. For instance, Facebook~\cite{Facebook} now uses a custom UDP
+transport. For completeness, it is noteworthy that TCP was designed as a general
+transport mechanism for a wide area network (WAN)~\cite{Clark:1988:DPD} and has
 experienced near universal adoption in environments as diverse as
-satellites~\cite{Henderson:1999:TPF}.
-This is primarily due to TCP's ability to provide reliability, congestion and
-flow control, and in-order packet delivery.
+satellites~\cite{Henderson:1999:TPF}. This is primarily due to TCP's ability to
+provide reliability, congestion and flow control, and in-order packet delivery.
 Moreover, its maturity makes it a ``kitchen sink'' solution for
 developers~\cite{Vasudevan:2009:SEF}. Naturally, it has become the transport of
 choice for the data center. But it is clear from the discussion above that TCP
@@ -216,36 +218,35 @@ routing, and the usage of short-term predictability for
 adaptation~\cite{Benson:2010:CFT,Benson:2011:MFG}. Further, data intensive
 computing frameworks (DICF) work at the level of a \emph{transfer}, which is not
 covered by existing solutions which operate at the flow or packet
-level~\cite{Chowdhury:2011:MDT}.
-Put differently, stages between DICF are dependent on bulk \emph{transfers} of
-data. These requirements suggest that there needs to be a decoupling between
-data transfer policy and mechanism. Therefore, in light of these requirements,
-this thesis presents the design, implementation, and evaluation of \emph{Mission
-Control}, an abstraction layer which operates between the applications layer,
-and network layer to choose the optimum transport protocol. Specifically, it
-uses runtime parameters, user-supplied requirements, network layout, and
-application semantics to dynamically choose the underlying transport protocol
-and schedule data transfer. The same strategy when applied at the network layer
-improves both application-level and network-level
-performance~\cite{Abu-Libdeh:2010:SRF}. In addition to improving performance,
-transport layer characteristics can also be chosen to improve energy
-efficiency~\cite{Heller:2010:ESE} or security~\cite{bittau:the}. Adding power
-constraints can greatly reduce the consumption footprint of today's data centers
-where the network consumes 10-20\% of the total power~\cite{Greenberg:2008:CCR}.
-Likewise, application traffic can transparently and
-efficiently~\cite{bittau:the} be encrypted to ensure security in a multi-tenant
-environment.
+level~\cite{Chowdhury:2011:MDT}. Put differently, stages between DICF are
+dependent on bulk \emph{transfers} of data. These requirements suggest that
+there needs to be a decoupling between data transfer policy and mechanism.
+Therefore, in light of these requirements, this thesis presents the design,
+implementation, and evaluation of \emph{Mission Control}, an abstraction layer
+which operates between the applications layer, and network layer to choose the
+optimum transport protocol. Specifically, it uses runtime parameters,
+user-supplied requirements, network layout, and application semantics to
+dynamically choose the underlying transport protocol and schedule data transfer.
+The same strategy when applied at the network layer improves both
+application-level and network-level performance~\cite{Abu-Libdeh:2010:SRF}. In
+addition to improving performance, transport layer characteristics can also be
+chosen to improve energy efficiency~\cite{Heller:2010:ESE} or
+security~\cite{bittau:the}. Adding power constraints can greatly reduce the
+consumption footprint of today's data centers where the network consumes 10-20\%
+of the total power~\cite{Greenberg:2008:CCR}. Likewise, application traffic can
+transparently and efficiently~\cite{bittau:the} be encrypted to ensure security
+in a multi-tenant environment.
 
 Our evaluation shows that\ldots\ldots
 
 The rest of this document is structured as follows. \S~\ref{chapter:background}
 gives an overview of the cloud computing paradigm, data intensive computing
 frameworks, and application models in the cloud. Related work is summarized in
-\S~\ref{chapter:relatedWork}.
-\S~\ref{chapter:designImplementation} presents the design and implementation of
-Mission Control. An evaluation of the network patterns of existing systems and
-of Mission Control is given in \S~\ref{chapter:evaluation}. Finally,
-\S~\ref{chapter:conclusion} concludes and points to future work.
+\S~\ref{chapter:relatedWork}. \S~\ref{chapter:designImplementation} presents the
+design and implementation of Mission Control. An evaluation of the network
+patterns of existing systems and of Mission Control is given in
+\S~\ref{chapter:evaluation}. Finally, \S~\ref{chapter:conclusion} concludes and
+points to future work.
 
 
 \chapter{Background}\label{chapter:background}
@@ -282,9 +283,9 @@ time. Data intensive computing frameworks are the subject of the next section.
 Computing}\label{chapter:background:section:dataIntensive}
 Google's MapReduce~\cite{Dean:2004:MSD} and its open source counterpart, Hadoop
 ~\cite{hadoop}, are at the forefront of data intensive computing. MapReduce is a
-programming model for performing large-scale computation on a cluster of
-commodity machines. It abstracts work division, communication, and fault
-tolerance beneath a two function API. The user only needs to specify a
+programming model and execution engine for performing large-scale computation on
+a cluster of commodity machines. It abstracts work division, communication, and
+fault tolerance beneath a two function API. The user only needs to specify a
 \emph{map} and \emph{reduce} function, while the framework takes care of the
 rest. The architecture consists of a master node and a set of worker nodes.
 The master node schedules shards of the input dataset -- stored on the
@@ -300,21 +301,21 @@ Speculative re-execution, slow executing tasks are speculatively re-executed on
 other nodes to improve the job completion time.
 
 One major shortcoming of MapReduce is that it is strictly a two-phase
-architecture, as a result of which, it cannot easily express multi-phase SQL
-like queries. Implementing these queries is awkward in the MapReduce paradigm as
-they constitute multiple MapReduce jobs, requiring external operators to merge
-the output~\cite{Yang:2007:MSR}. Additionally, the framework is also handicapped
-by its single input, single output restriction. These shortcomings are addressed
-by Microsoft's Dryad system~\cite{Isard:2007:DDD}. Dryad is a general purpose
-framework that supports the processing of algorithms with directed cyclic graph
-(DAG) flows. Like MapReduce, the framework abstracts work scheduling, data
-partitioning, fault tolerance, and communication beneath a data-flow execution
-engine. To this end, the developer only needs to a) construct a DAG of
-processing using provided primitives, and b) provide a binary executable for
-nodes in the DAG. Each vertex in the graph represents the execution of some
-operation over its input data while the edges between the vertices represent the
-communication patterns. The framework automatically schedules each vertex to a
-machine/core and sets up the communication channels.
+architecture, as a result of which, it cannot easily express multi-phase
+SQL-like queries. Implementing these queries is awkward in the MapReduce
+paradigm as they constitute multiple MapReduce jobs, requiring external
+operators to merge the output~\cite{Yang:2007:MSR}. Additionally, the framework
+is also handicapped by its single input, single output restriction. These
+shortcomings are addressed by Microsoft's Dryad system~\cite{Isard:2007:DDD}.
+Dryad is a general purpose framework that supports the processing of algorithms
+with directed cyclic graph (DAG) flows. Like MapReduce, the framework abstracts
+work scheduling, data partitioning, fault tolerance, and communication beneath a
+data-flow execution engine. To this end, the developer only needs to a)
+construct a DAG of processing using provided primitives, and b) provide a binary
+executable for nodes in the DAG. Each vertex in the graph represents the
+execution of some operation over its input data while the edges between the
+vertices represent the communication patterns. The framework automatically
+schedules each vertex to a machine/core and sets up the communication channels.
 It is important to highlight that unlike MapReduce, Dryad vertices can have
 multiple inputs and outputs depending on the programming semantics. Finally,
 developers can easily use high-level languages to restrict the programming
@@ -325,18 +326,17 @@ with sequential flow, they fall short of supporting iterative and recursive
 applications~\cite{Bu:2010:HEI,Zaharia:2010:SCC}. In addition, these
 applications, such as \emph{k}-means clustering, PageRank, etc., require a more
 expressive language to define their flow. These problems are addressed by
-CIEL~\cite{Murray:2011:CUE} which includes a language runtime, and execution
-engine, to support large-scale distributed computing. CIEL contains two
-components: 1) A scripting language, \emph{Skywriting}~\cite{Murray:2010:SCS},
-and 2) A distributed execution engine. Skywriting is a Turing-complete language
-that can be used to express data-dependent control flow. It provides primitives
-to loop over expressions or call them recursively. In addition, scripting
-primitives can be used to spawn and execute tasks, and de-reference data
-(reminiscent of pointers in C/C++). Further, it provides library functions to
-express the flow of other frameworks such as MapReduce, as CIEL subsumes both
-MapReduce, and Dryad. Architecturally, CIEL is similar to MapReduce and Dryad,
-in that it also has a single master and several worker nodes, with the former in
-charge of computation state, and the latter in charge of the actual computation.
+CIEL~\cite{Murray:2011:CUE} which includes two components: 1) A scripting
+language, \emph{Skywriting}~\cite{Murray:2010:SCS}, and 2) A distributed
+execution engine. Skywriting is a Turing-complete language that can be used to
+express data-dependent control flow. It provides primitives to loop over
+expressions or call them recursively. In addition, scripting primitives can be
+used to spawn and execute tasks, and de-reference data (reminiscent of pointers
+in C/C++). Further, it provides library functions to express the flow of other
+frameworks such as MapReduce, as CIEL subsumes both MapReduce, and Dryad.
+Architecturally, CIEL is similar to MapReduce and Dryad, in that it also has a
+single master and several worker nodes, with the former in charge of computation
+state, and the latter in charge of the actual computation.
 CIEL relies on three primitives--objects, references, and tasks--for dynamic
 task graphs. Specifically, objects are data sequences that are used for input,
 and are generated as output. Objects which have not been fully computed yet, can
@@ -357,14 +357,14 @@ systems~\cite{Zaharia:2010:DSS,Isard:2009:QFS,Zaharia:2008:IMP}. While these
 proposals have been successful in improving scheduling and fairness, the network
 utilization of these batch-processing systems has largely been ignored. A recent
 system, Orchestra~\cite{Chowdhury:2011:MDT}, works at the application layer to
-enable intra and inter-transfer control of two communication patterns, which lie
-at the heart of batch processing systems such as MapReduce:
-\emph{shuffles}, and \emph{broadcasts}. For the former it uses weighted flow
+enable intra- and inter-transfer control of two communication patterns, which
+lie at the heart of batch processing systems such as MapReduce:
+\emph{shuffles}, and \emph{broadcasts}. For the former, it uses weighted flow
 assignment (WFA) enabled by an appropriate number of multiple TCP connections
 and TCP's AIMD fair sharing while for the latter it leverages a BitTorrent-like
 algorithm. Architecturally, it is a centralized application layer controller for
 both intra and inter-transfer communication. The former is managed by one or
-more Transfer Controllers (TCs) while the latter is managed by a Inter-transfer
+more Transfer Controllers (TCs) while the latter is managed by an Inter-transfer
 Controller (ITC). The TC continuously monitors the transfer and updates the set
 of sources associated with each destination. TCs manage the transfer at the
 granularity of flows, by choosing how many concurrent flows to open from each
@@ -414,57 +414,187 @@ events to groups with ordering guarantees.
 Segue to Isis2~\cite{Birman:2012:OCW}.
 
 \chapter{Related Work}\label{chapter:relatedWork}
+This section presents relevant related work on data center networking in general
+and also specific to data intensive computing.
 
 \section{Topologies}
-Portland~\cite{NiranjanMysore:2009:PSF}, VL2~\cite{Greenberg:2009:VSF},
-FatTree~\cite{Al-Fares:2008:SCD}, Dcell~\cite{Guo:2008:DSF},
-BCube~\cite{Guo:2009:BHP}.
+Data intensive computing frameworks such as MapReduce require full-bisection
+bandwidth during the data shuffle phase. Unfortunately, a regular 2/3-layer tree
+topology is unable to cater to this need as links up the tree hierarchy are
+shared and hence, become a bottleneck. To remedy this, a number of novel
+topologies have recently been proposed.
 
-CamCube proposes a 3D torus topology in which each server is directly connected
-to a small set of other servers, inspired by structured
-overlays~\cite{Abu-Libdeh:2010:SRF}. This scheme places each server into a 3D
-wrapped coordinate space and its position (\emph{x,y,z}) in the space represents
-its address. As a result, the physical and virtual topology of the network is
-the same and applications can infer their location through an API which exposes
-coordinate space information and allows one-hop Ethernet packets. Thus,
-applications can implement their own routing strategies. Mission Control can be
-used on CamCube to enable applications to choose both their routing strategies
-and their transport mechanism.
+Al-Fares et al.\cite{Al-Fares:2008:SCD} present a data center architecture using
+a fat-tree topology which aims to support full-bisection bandwidth. A k-aray
+fat-tree enables each host and switch to have redundant links. IP addresses are
+assigned in the network based on the location of the element in the topology. To
+achieve even load balancing, a two-level routing table is employed. Further, a
+central route control statically generates all routing tables and loads them
+into switches. In addition, the architecture also enables flow classification
+and scheduling to minimize overlap between flows. Finally, a failure broadcast
+protocol is used to enable switches to route around failures.
+VL2~\cite{Greenberg:2009:VSF} also uses a fat-tree topology but requires no
+changes to the underlying L2 fabric. It uses two different addressing schemes to
+simplify virtual machine migration. Interfaces and switches use
+location-specific addresses while application use application-specific
+addresses. The mapping between these two schemes is maintained by a replicated
+directory service. To spread traffic over the multiple links, VL2 uses both
+valiant load balancing (VLB) and equal-cost multi-path routing (ECMP).
+
+In contrast to fat-tree and VL2, DCell~\cite{Guo:2008:DSF} is a recursive,
+server-centric architecture. Each server is connected to other servers directly
+and through a small number of switches. DCells form a fully-connected graph and
+can be assembled together to form high-level DCells. Servers in DCells are
+identified by their position in the structure. Further, it uses a fault-tolerant
+single-path routing algorithm that exploits the recursive structure of the
+topology. A related architecture, BCube~\cite{Guo:2009:BHP}, is similar in
+structure but targets modular data centers~\cite{Vishwanath:2009:MDC}. Switches
+in BCube only connect servers, while servers themselves relay their traffic.
+Servers are addressed using an array based on its position, as a result
+neighbouring servers only differ by a single digit in the array. This
+information is used by source servers to encode routing information in the
+packet headers, which are in turn, used by servers for packet forwarding.
+
+Another radical architecture is CamCube, which proposes a 3D torus topology in
+which each server is directly connected to a small set of other servers,
+inspired by structured overlays~\cite{Abu-Libdeh:2010:SRF}. This scheme places
+each server into a 3D wrapped coordinate space and its position (\emph{x,y,z})
+in the space represents its address. As a result, the physical and virtual
+topology of the network is the same and applications can infer their location
+through an API which exposes coordinate space information and allows one-hop
+Ethernet packets. Thus, applications can implement their own routing strategies.
+
+One problem that plagues these topologies is of incremental expansion. As a
+result of their rigid, well-defined structure, incremental expansion can only be
+done if the structure is preserved. Jellyfish~\cite{Singla:2011:JND} addresses
+this problem by constructing a random graph topology. Random graphs achieve low
+diameter and high bisection bandwidth while allowing incremental expansion with
+any number of nodes. At the same time, Jellyfish can enable full-bisection
+bandwidth with a lower switch count than a fat-tree.
+
+Finally, these topologies have also spawned a number of systems to improve their
+management and construction. Alias~\cite{Walraed-Sullivan:2011} and
+DAC~\cite{Chen:2010:GAA} can be used to automatically assign addresses to these
+topologies. Perseus~\cite{Mudigonda:2011:TFC} is a framework that enables
+designers to choose an optimum data center design based on bandwidth, cost,
+application requirements, etc. The framework currently supports fat-tree and
+HyperX topologies. Specifically, user requirements and chosen topologies are
+given as input to Perseus which then generates a design with a candidate
+topology, optimized cabling, cost, and a visualization of the structure.
 
 Although, these topologies expose full bisection bandwidth, in practice due to
 multi-tenancy~\cite{Costa:2012:CEI}, and TCP's inefficiency in (a) moving away
 from congested links, and (b) exploiting multiple links~\cite{Raiciu:2011:IDP},
 applications do not experience the full benefit. In addition, these topologies
-also increase the overall cost and wiring complexity.
+also increase the overall cost and wiring complexity. In data centers which
+already have these topologies, Mission Control can be used to exploit their
+multiple links. For example, it can be used on CamCube to enable applications to
+choose both their routing strategies and their transport mechanism.
 
-\section{Global Schedulers}
-PLayer~\cite{Joseph:2008:PSL}, MicroTE~\cite{Benson:2011:MFG}
+\section{Ethernet Fabrics}
+Ethernet also faces a number of scalability challenges in a data center
+environment. 
+
+SPAIN~\cite{Mudigonda:2010:SCD} is an Ethernet fabric that implements forwarding
+along multiple paths connected by commodity switches and arbitrary topologies.
+Specifically, it overcomes the single spanning restriction of the Spanning Tree
+Protocol (STP) by making use of multiple spanning trees which are calculated
+offline. In topologies with multiple paths, each spanning tree is organized into
+a separate VLAN to exploit path redundancy. In addition, it also minimizes the
+overhead of packet flooding and host broadcasts.
+NetLord~\cite{Mudigonda:2011:NSM} is a related system which enables flexibility
+in choosing VM addresses. To this end, it implements IP encapsulation for custom
+L2 packets and uses SPAIN as the underlying fabric. This enables NetLord to
+scale to a large number of tenants and VMs. It also uses a custom push-based ARP
+protocol to keep location information consistent. Similarly,
+Portland~\cite{NiranjanMysore:2009:PSF} is a layer 2 routing and forwarding
+fabric that uses topological information to assign end-hosts hierarchical
+pseudo-MAC (PMAC) addresses. It employs a centralized directory service to map
+PMAC onto physical MAC addresses. All routing and forwarding takes place using
+PMAC prefixes while the end-hosts only see MAC addresses. In addition, the
+centralized directory service eliminates the need for broadcast based ARP and
+DHCP. Finally, end-hosts are modified to spread load over the available paths.
+Vattikonda et al. explore a new point in the design space by dispensing with TCP
+altogether and replacing it with a time-division multiple access (TDMA) MAC
+layer~\cite{Vattikonda:2012:PTD}. To this end, they employ centralized
+scheduling to give communicating end-hosts exclusive access to links. This
+exclusive assignment of link bandwidth and switch buffer space automatically
+mitigates in-network queuing and congestion. All of these proposals work at
+layer 2 and are as such, complementary to our work.
+
+\section{Global Schedulers and Resource Allocators}
+To enable applications to make use of multiple paths in the network, a number of
+schedulers have also been proposed. One such scheduler is
+Hedera~\cite{Al-Fares:2010:HDF} which uses flow information from Openflow
+switches to compute non-conflicting paths for flows, which are in turn pushed
+back to the switches. This enables the network to maximize bisection bandwidth.
+It provides a number of algorithms for choosing optimum paths. Similarly,
+DevoFlow~\cite{Curtis:2011:DSF} is a modification of the Openflow architecture
+that tries to handle most flows in the data plane to achieve scalability. Hence,
+Hedera-like schedulers only need to deal with \emph{interesting} flows.
+
+MicroTE~\cite{Benson:2011:MFG} is a traffic engineering systems that adapts to
+variation in network traffic at the granularity of a second. It consists of a
+central controller that creates a global view of traffic demands and coordinates
+scheduling using Openflow. To this end, it differentiates between predictable
+traffic and non-predictable traffic. For the former, it computes routes based on
+some global objective to achieve optimum routing. The leftover routes are then
+used to stripe unpredictable traffic using weighted equal-cost multi-path
+routing (ECMP).
+
+Oktupus~\cite{Ballani:2011:TPD} is a resource allocator that uses ``virtual
+networks'' as an abstraction to expose to users. This allows the cloud provider
+to decouple the virtual network and the underlying physical network. As a
+result, there is a tradeoff between application goals for performance and
+provider goals for optimum utilization of resources. For all-to-all
+communication, such as MapReduce traffic, a \emph{virtual cluster} is employed
+which provides the illusion of all virtual machines being connected to the same
+non-oversubscribed virtual switch.  For applications with a local traffic
+pattern, a \emph{virtual oversubscribed cluster} is employed which emulates an
+oversubscribed two-tier cluster. Specifically, Oktupus uses physical network
+topology, machine usage, etc., to allocate physical machines to users. In
+addition, explicit bandwidth rate-limiting at the end hosts is employed to
+control bandwidth.
+
+In contrast to all of these systems, Mission Control uses the diversity in
+transport protocols to achieve optimum routing and congestion control.
 
 \section{Transport Protocols}
+In this section we enumerates transport protocols which are supported by Mission
+Control.
+
 Deadline-Driven Delivery (D$^3$)~\cite{Wilson:2011:BNL} is a data
 center-specific version of TCP that targets applications with distributed
 workflow and latency targets. These applications associate a deadline with each
-network flow and the flow is only useful if the deadline is met. Unfortunately,
-TCP tries to achieve global fairness and maximize throughput while remaining
-agnostic to any flow specific deadline. To this end, applications expose flow
-deadline and size information which is exploited by end hosts to request rates
-from routers along the data path. Routers only maintain aggregate counters and
-thus, do not maintain any per-flow state. As a result, they are able to allocate
-sending rates to flows in order for as many deadlines to be met as possible. On
-the downside, D$^3$ requires changes to applications, end-hosts, and network
-elements. For data centers with customizable network elements, Mission Control
-can use D$^3$ for applications that expose explicit deadline information.
-
+network flow and the flow is only useful if the deadline is met\footnote{TCP on
+the other hand tries to achieve global fairness and maximize throughput while
+remaining agnostic to any flow specific deadline.}. To this end, applications
+expose flow deadline and size information which is exploited by end hosts to
+request rates from routers along the data path. Routers only maintain aggregate
+counters and thus, do not maintain any per-flow state. As a result, they are
+able to allocate sending rates to flows in order for as many deadlines to be met
+as possible. On the downside, D$^3$ requires changes to applications, end-hosts,
+and network elements. For data centers with customizable network elements,
+Mission Control can use D$^3$ for applications that expose explicit deadline
+information.
 
 Data Center TCP (DCTCP)~\cite{Alizadeh:2010:DCT} uses Explicit Congestion
 Notifications (ECN) from switches to perform active queue management based
 congestion control. Specifically, it uses the congestion experienced flag in
 packets--set by switches whenever the buffer occupancy exceeds a small
 threshold--to reduce the size of the window based on a fraction of the marked
-packets. This enables DCTCP to react quickly reach to queue buildup and avoid
-buffer pressure. DCTCP can only work in a network with ECN-compatible switches.
+packets. This enables DCTCP to react quickly to queue buildup and avoid buffer
+pressure. DCTCP can only work in a network with ECN-compatible switches.
 Therefore, Mission Control enables DCTCP if it detects that switches in the
-network support ECN.
+network support ECN. A spin-off architecture is HULL~\cite{Alizadeh:2012:LIM},
+high-bandwidth ultra-low latency, that aims to make a trade-off between
+bandwidth and latency for low-latency applications in a shared environment. To
+this end, it reduces network buffering by replacing queue occupancy based
+congestion control with link utilization. It makes use of \emph{phantom queues}
+which give the illusion of draining a link at less than its actual rate.
+End-hosts employing DCTCP experience reduced transmission rate based on ECN from
+these phantom queues. This enables the overall network to trade bandwidth for
+latency.
 
 Structured Stream Transport (SST)~\cite{Ford:2007:SSN} finds the middle-ground
 between stream and datagram transmission. It implements a hierarchical and
@@ -478,13 +608,30 @@ requirements. Mission Control can use SST to enable MapReduce-like systems to
 prioritize their data transfers, by opening multiple substreams, and to send
 lightweight control traffic using ephemeral streams.
 
+Raiciu et al.\cite{Raiciu:2010:DCN} argue that current data center architectures
+use random load balancing (RLB) to balance load across multiple paths. RLB is
+unable to achieve full bisectional bandwidth because certain flows always
+traverse the same path. This creates hotspots in the topology, where certain
+links are oversubscribed and some are under/un-subscribed. Global flow
+controllers fail in this regard too as they are unable to scale with the number
+of flows. To remedy this, they propose the use of multipath TCP (MPTCP) to
+establish multiple subflows over different paths between a pair of end-hosts.
+The key point is that these subflows operate under a single TCP connection. They
+argue that this ensures fairness as the fraction of the total congestion window
+for each flow is determined by its speed, i.e. the faster a flow is, the steeper
+the slope of its additive increase. This will also move traffic away from the
+most congested paths. MPTCP is supposed by Mission Control in multipath
+networks.
+
 \subsection{Incast}
-Vasudevan et al.~\cite{Vasudevan:2009:SEF} propose increase the granularity of
-kernel timers to enable microsecond granularity RTT estimation, which is turn
-used to set the RTO. They shows that reducing the RTO can increase the goodput
-of simultaneous connections and hence negate Incast. Further, making
+A number of proposals have also tried to tackle Incast. 
+
+Vasudevan et al.~\cite{Vasudevan:2009:SEF} propose increasing the granularity of
+kernel timers to enable microsecond granularity RTT estimation, which is in turn
+used to set the RTO. They show that reducing the RTO can increase the goodput of
+simultaneous connections and hence negate Incast. Further, making
 retransmissions random, can also increase the goodput by stopping multiple flows
-from timings out, backing off, and retransmitting simultaneously. The takeaway
+from timing out, backing off, and retransmitting simultaneously. The takeaway
 lesson is that to avoid Incast in low-latency data center networks, RTOs should
 be on the same scale as network latency. Chen et al.~\cite{Chen:2009:UTI}
 complement the analysis of the previous work by defining an analytical model for
@@ -493,15 +640,14 @@ value and the inter-packet wait time. Unlike, these two solutions which focus on
 post hoc recovery, ICTCP~\cite{Wu:2010:IIC} aims to avoid packet losses before
 Incast manifestation. To this end, ICTCP implements a window based congestion
 control algorithm at the receiver side. Specifically, the available bandwidth at
-the receiver is used as a trigger to perform congestion control.
-The frequency of this control changes dynamically based on the queueing delay
-and is larger than one RTT. Finally, connection throughput is only throttled to
-avoid Incast, not to decrease application goodput. We believe that all of these
-implementations can be used under Mission Control depending on the dynamics
-of the load.
+the receiver is used as a trigger to perform congestion control. The frequency
+of this control changes dynamically based on the queueing delay and is larger
+than one RTT. Finally, connection throughput is only throttled to avoid Incast,
+not to decrease application goodput. We believe that all of these
+implementations can be used under Mission Control depending on the dynamics of
+the load.
 
 \section{Data Center Traffic Analysis}
-~\cite{Benson:2010:NTC},,
 Kandula et al.~\cite{Kandula:2009:NDC} present an analysis of the traffic of a
 1500 server data center. They use lightweight measurements at end-hosts in
 conjunction with application level data to note the cause and effect of network
@@ -523,7 +669,15 @@ avoid congestion. Finally, traffic is bursty in nature and packet inter-arrival
 times during spike periods follow a lognormal distribution. In a follow-up
 paper, Benson et al.~\cite{Benson:2010:NTC} augment their previous work by
 studying different classes of data centers. These include, university campus,
-private enter
+private enterprise, and cloud data centers. In this work, they examine the
+variation in link utilization and the magnitude of losses as well as the nature
+of hotspots. Their measurements show that for cloud data centers, 80\% of the
+traffic stays within the rack and the number of highly utilized core links never
+exceeds 25\% of the total links.
+
+We use the insight provided by these studies to keep the design of Mission
+Control generic enough to cater to the needs of these wide-varying traffic
+patterns.
 
 \section{Reducing Network Traffic}
 Another point in the design space is to reduce the amount of traffic that is
@@ -538,47 +692,51 @@ associative~\cite{Dean:2004:MSD}. For other function types, Camdoop distributes
 the implicit sort and merge of MapReduce across all servers. At the same time, a
 custom transport layer performs global scheduling of packets. This solution is
 only applicable to a CamCube topology but shows that custom transport protocols
-can greatly enhance performance.
+can greatly enhance performance. In the same vein, SUDO~\cite{Zhang:2012:ODS}
+leverages the functional and data-partition properties of user-defined functions
+in MapReduce-like systems to enable various optimizations. This enables the
+framework to avoid unnecessary data-shuffling steps and reduce disk and network
+I/O. While these frameworks reduce the amount of data transferred across the
+network, they still rely on standard TCP, inheriting its flaws.
 
 \section{Wireless and Optical Networks}
 Another line of work has argued that providing full-bisection links throughout
 the network is overkill as only a few hotspots exist in actual data
 centers~\cite{{Halperin:2011:ADC,Kandula:2009:FTD}}. The high cost and technical
-challenges of newer topologies can be avoided by provisining the network for the
-average case and avoiding hotspots by adding additional links on the fly.
+challenges of newer topologies can be avoided by provisioning the network for
+the average case and avoiding hotspots by adding additional links on the fly.
 The key challenge is to choose the placement and duration of \emph{flyways}.
-Flyways are constructed using Multi-Gigabit wireless links, controlled by a
-centralized scheduler that decides the temporal and spatial placement of
-wireless links based on observed traffic. In cases where the traffic has high
-churn, the controller would fail to respond quickly.
+In this proposals, flyways are constructed using Multi-Gigabit wireless links,
+controlled by a centralized scheduler that decides the temporal and spatial
+placement of wireless links based on observed traffic. On major shortcoming of
+this approach is that in cases where the traffic has high churn, the controller
+would fail to respond quickly.
 
-\section{Energy Efficiency and Security}
-ElasticTree is a system that dynamically alters the power consumption of
-networking elements inside a data center based on the current
-traffic~\cite{Heller:2010:ESE}. It consists of an optimizer, routing control,
-and power control. Based on the topology, traffic matrix, other inputs, the
-optimizer computes an optimum power network subnet which is in turn fed to the
-power control and the routing control. The former toggles the power state of
-network elements, and the latter chooses paths for each flow. The optimizer
-provides a number of strategies which make a trade-off between scalability, and
-optimality. ElasticTree can be used in conjunction with Mission Control to
-choose an underlying transport protocol that behaves well with it. For example,
-the performance of TCP is adversely affected if there is packet reordering due
-to the splitting for a single flow across multiple links by ElasticTree.
+Likewise, c-Through~\cite{Wang:2010:CPO} and Helios~\cite{Farrington:2010:HHE}
+consider using hybrid packet and circuit switched networks in order to use
+optical links to address hotspots. c-Through connects racks using optical
+circuit-switched links based on traffic demand. Network isolation is ensured by
+using a separate VLAN for the optical and electrical rack links. End-hosts are
+used for traffic statistics collection while a central manager, connected to the
+optical switch, is used to manage configuration. In contrast,
+Helios~\cite{Farrington:2010:HHE} targets modular data
+centers~\cite{Vishwanath:2009:MDC}. It uses flow counters in switches to
+calculate the traffic matrix and in turn, uses that information to work out a
+topology to maximize throughput. Finally, OSA~\cite{Chen:2012:OSA} is a
+clean-slate all-optical network which can alter its topology and link capacities
+based on the traffic demand.
 
-TCPcrypt is a backwards compatible enhancement to TCP that uses aims to
-efficiently provide encrypted communication, transparently to
-applications~\cite{bittau:the}. To this end, it uses a custom key exchange
-protocol that leverages the TCP options field. Like SSL, to reduce the cost of
-connection setup for short-lived flows, it enables cryptographic state from one
-TCP connection to bootstrap subsequent ones. Even for legacy applications, it
-protects against passive eavesdropping. Additionally, TCPcrypt protects the
-integrity of TCP sessions, and defends against attacks that change their state
-or affect their performance. Finally, applications can also be made aware of the
-presence of TCPcrypt to negate redundant encryption. We use TCPcrypt as a secure
-transport protocol option in Mission Control.
+While we do not consider wireless and optical links in this work, Mission
+Control is flexible enough to support both. For example, Mission Control
+maintains a global view of the network, therefore it can choose flyways or
+optical paths for hotspots, if required.
 
-\section{Virtualization}
+\section{Virtualization and Rate Limiting}
+To take advantage of economies of scale and achieve optimum resource
+utilization, most data centers are virtualized. As a result, resources are
+shared amongst the tenants, which can lead to contention and other undesired
+behvaiour.
+
 Due to VM consolidation, the RTT of TCP connections to VMs increases
 significantly, causing the latency of connections to go up. vSnoop is a system
 that allows the driver domain of a host to send an acknowledgement on behalf of
@@ -592,9 +750,74 @@ number of packets~\cite{Gamage:2011:OFI}. Regardless of the transport protocol,
 Mission Control can delegate congestion control to the driver domain in
 virtualized environments.
 
+Another related body of work deals with ensuring bandwidth fairness among
+virtual machines and tenants in the data center. Seawall~\cite{Shieh:2010:SPI}
+uses hypervisor-based rate limiting in conjunction with IP layer feedback
+signals from the network to regulate egress traffic. Standard rate control
+algorithms, such as TCP, TCP friendly rate control (TFRC), or quantized
+congestion notification (QCN) are used to implement rate limiting. On the
+downside, as Seawall is VM-centric, it does not divide the link bandwidth among
+tenants using the link, but among the total number of VMs sending traffic
+through that link. Therefore, tenants with a large number of VMs unfairly get a
+large share in bandwidth. Similarly, Gatekeeper~\cite{Rodrigues:2011:GSB} works
+at the virtualization layer of end-hosts to ensure bandwidth fairness. It
+achieves scalability by using a point-to-point protocol and maintains minimum
+data center-wide control state. Maximum and minimum rate is set for both ingress
+and egress traffic at the vNIC level and scheduled using a weighted fair
+scheduler. In addition, ingress and egress traffic is monitored and if limits
+are exceeded, a feedback message with an explicit rate is sent to all VMs
+involved in the traffic. Likewise, SecondNet~\cite{Guo:2010:SDC} uses a
+\emph{virtual data center} (VDC) abstraction for resource allocation. It allows
+the assignment of a set of VMs with computation, storage, and bandwidth
+guarantees. Architecturally, a central manager is in charge of all resources
+while virtual-to-physical mappings and network state is controlled by the source
+hypervisors. While SecondNet can guarantee end-to-end bandwidth, it can only be
+used if the bandwidth requirements are known a priori. Choosing an exact
+bandwidth is non-trivial for most applications as bandwidth is a function of
+their communication pattern.
+
+\section{Energy Efficiency and Security}
+In addition to performance and fairness, energy efficiency and security are of
+great important in the data center as well. 
+
+ElasticTree is a system that dynamically alters the power consumption of
+networking elements inside a data center based on the current
+traffic~\cite{Heller:2010:ESE}. It consists of an optimizer, routing control,
+and power control. Based on the topology, traffic matrix, and other inputs, the
+optimizer computes an optimum power network subnet which is in turn fed to the
+power control and the routing control. The former toggles the power state of
+network elements, and the latter chooses paths for each flow. The optimizer
+provides a number of strategies which make a trade-off between scalability, and
+optimality. ElasticTree can be used in conjunction with Mission Control to
+choose an underlying transport protocol that behaves well with it. For example,
+the performance of TCP is adversely affected if there is packet reordering due
+to the splitting for a single flow across multiple links by ElasticTree.
+
+TCPcrypt is a backwards compatible enhancement to TCP that aims to efficiently
+provide encrypted communication, transparently to
+applications~\cite{bittau:the}. To this end, it uses a custom key exchange
+protocol that leverages the TCP options field. Like SSL, to reduce the cost of
+connection setup for short-lived flows, it enables cryptographic state from one
+TCP connection to bootstrap subsequent ones. Even for legacy applications, it
+protects against passive eavesdropping. Additionally, TCPcrypt protects the
+integrity of TCP sessions, and defends against attacks that change their state
+or affect their performance. Finally, applications can also be made aware of the
+presence of TCPcrypt to negate redundant encryption. We use TCPcrypt as a secure
+transport protocol option in Mission Control.
+
 \chapter{Design and Implementation}\label{chapter:designImplementation}
 
 \section{Design}
+
+1. Similar in architecture to target frameworks: One master, many workers.
+
+2. Master workers as a centralized scheuler.
+
+3. No change to physical infrastructure.
+
+4. Application layer.
+
+5. Scalable.
 
 \section{Implementation}
 Different Kernels, Isis2, Python, C\#, and IronPython.
@@ -618,6 +841,9 @@ local. Pointer to reconfigurable I/O channels?
 
 - Possibly merge with Mesos~\cite{Hindman:2011:MPF} and
 Akaros~\cite{Rhoden:2011:IPE} or Quincy~\cite{Isard:2009:QFS}.
+
+- 80\% of the traffic stays within a rack~\cite{Benson:2010:NTC}, can we
+optimize it?
 
 
 \appendix
