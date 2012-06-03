@@ -24,7 +24,7 @@ in Data Intensive Computing}
 \def\wordcount{0}
 
 
-\usepackage{epsfig,graphicx,parskip,setspace,tabularx,xspace,epstopdf,url,caption,subcaption} 
+\usepackage{epsfig,graphicx,parskip,setspace,tabularx,xspace,epstopdf,url,caption,subcaption,float} 
 \graphicspath{{./Figures/}}
 
 %% START OF DOCUMENT
@@ -219,7 +219,10 @@ zero~\cite{Wang:2010:IVN}.
 
 All of these problems have even prompted large-scale deployments to abandon TCP
 altogether. For instance, Facebook~\cite{Facebook} now uses a custom UDP
-transport. For completeness, it is worth noting that TCP was designed as a
+transport. Some researchers have gone to the extent of suggesting that fixing
+TCP is tantamount to ``saving the world''~\cite{Lyon:2008:TII}\footnote{Heat and
+CO$_{2}$ emissions and radioactive waste can be accounted to TCP's
+inefficiency}. For completeness, it is worth noting that TCP was designed as a
 general transport mechanism for a wide area network (WAN)~\cite{Clark:1988:DPD}
 and has experienced near universal adoption in environments as diverse as
 satellites~\cite{Henderson:1999:TPF}. This is primarily due to TCP's ability to
@@ -352,8 +355,8 @@ with sequential flow, they fall short of supporting iterative and recursive
 applications~\cite{Bu:2010:HEI,Zaharia:2010:SCC}. In addition, these
 applications, such as \emph{k}-means clustering, PageRank, etc., require a more
 expressive language to define their flow. These problems are addressed by
-CIEL~\cite{Murray:2011:CUE} which includes two components: 1) A scripting
-language, \emph{Skywriting}~\cite{Murray:2010:SCS}, and 2) A distributed
+CIEL~\cite{Murray:2011:CUE} which includes two components: (1) A scripting
+language, \emph{Skywriting}~\cite{Murray:2010:SCS}, and (2) A distributed
 execution engine. Skywriting is a Turing-complete language that can be used to
 express data-dependent control flow. It provides primitives to loop over
 expressions or call them recursively. In addition, scripting primitives can be
@@ -374,6 +377,36 @@ alternatively, spawn other tasks to do so. Tasks can be executed in either
 strategy. Finally, CIEL uses a number of optimizations to improve performance
 such as deterministic naming, and streaming.
 
+\begin{figure}[h!]
+        \begin{subfigure}[b]{0.4\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{MapReduce.eps}
+                \caption{MapReduce has
+        two stages with single input and single output.}
+                \label{fig:mapreduce}
+        \end{subfigure}%
+        \hspace{0.1pt}
+        \begin{subfigure}[b]{0.5\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{Dryad.eps}
+                \caption{Dryad execution can
+        consist of multiple stages with multiple input and multiple output.}
+                \label{fig:dryad}
+        \end{subfigure}
+        \vspace{0.1pt}
+        \begin{subfigure}[b]{0.8\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{CIEL.eps}
+                \caption{CIEL
+        execution, which subsumes MapReduce and Dryad, can consist of multiple
+        stages with multiple input and multiple output and tasks can dynamically
+        spawn other tasks as well.}
+                \label{fig:ciel}
+        \end{subfigure}
+        \caption{Overview of data intensive computing frameworks.}
+        \label{chap:intro:fig:frameworks}
+\end{figure}
+
 There are also high-level
 languages~\cite{Olston:2008:PLN,Pike:2005:IDP,Murray:2010:SCS,Yu:2008:DSG} which
 allow users to write applications which are transparently translated into a
@@ -382,6 +415,7 @@ addition, there is a rich body of work which aims to reduce the turn-around time
 of these systems~\cite{Zaharia:2010:DSS,Isard:2009:QFS,Zaharia:2008:IMP}. While
 these proposals have been successful in improving scheduling and fairness, the
 network utilization of these batch-processing systems has largely been ignored.
+
 As mentioned earlier, these frameworks operate over large amounts of data inside
 environments which are error-prone. Therefore, they have to make trade-offs
 between consistency, replication, scalability, and reliability. These issues are
@@ -439,14 +473,14 @@ shared and hence, become a bottleneck. To remedy this, a number of novel
 topologies have recently been proposed.
 
 Al-Fares et al.\cite{Al-Fares:2008:SCD} present a data center architecture using
-a fat-tree topology which aims to support full-bisection bandwidth. A k-aray
-fat-tree enables each host and switch to have redundant links. IP addresses are
-assigned in the network based on the location of the element in the topology. To
-achieve even load balancing, a two-level routing table is employed. Further, a
-central route control statically generates all routing tables and loads them
-into switches. In addition, the architecture also enables flow classification
-and scheduling to minimize overlap between flows. Finally, a failure broadcast
-protocol is used to enable switches to route around failures.
+a fat-tree topology which aims to support full-bisection bandwidth. A
+\emph{k}-aray fat-tree enables each host and switch to have redundant links. IP
+addresses are assigned in the network based on the location of the element in
+the topology. To achieve even load balancing, a two-level routing table is
+employed. Further, a central route control statically generates all routing
+tables and loads them into switches. In addition, the architecture also enables
+flow classification and scheduling to minimize overlap between flows. Finally, a
+failure broadcast protocol is used to enable switches to route around failures.
 VL2~\cite{Greenberg:2009:VSF} also uses a fat-tree topology but requires no
 changes to the underlying L2 fabric. It uses two different addressing schemes to
 simplify virtual machine migration. Interfaces and switches use
@@ -649,10 +683,10 @@ which is in turn used to set the RTO. They show that reducing the RTO can
 increase the goodput of simultaneous connections and hence negate incast.
 Furthermore, making retransmissions random can also increase the goodput by
 stopping multiple flows from timing out, backing off, and retransmitting
-simultaneously. The takeaway lesson is that to avoid Incast in low-latency data
+simultaneously. The takeaway lesson is that to avoid incast in low-latency data
 center networks, RTOs should be on the same scale as network latency. Chen et
 al.~\cite{Chen:2009:UTI} complement the analysis of the previous work by
-defining an analytical model for Incast. This model shows that goodput is
+defining an analytical model for incast. This model shows that goodput is
 affected by both the minimum RTO timer value and the inter-packet wait time.
 Unlike these two solutions which focus on post hoc recovery,
 ICTCP~\cite{Wu:2010:IIC} aims to avoid packet losses before incast
@@ -848,8 +882,6 @@ applications beforehand. This is impractical as the prediction of network
 traffic is non-trivial and application requirements are dynamic over the course
 of their execution.
 
-\label{chapter:background:section:consistency}
-
 \chapter{Design and Implementation}\label{chapter:designImplementation}
 In this section, we present the design and implementation of Mission Control.
 
@@ -911,11 +943,11 @@ Paxos~\cite{Lamport:1998:PP}.
 \chapter{Evaluation}\label{chapter:evaluation}
 
 \section{Testbed}
-For all our experiments we use a machine (brand?) with 48 x86\_64 AMD Opteron
-processors, with each processor clocked at 2 GHz with a 512 KB cache. The system
-has 64 GB of RAM, 1 TB of HDD, and 1 Gbps network connectivity. In addition, the
-system is also provisioned with a 256 GB solid state drive\footnote{We use the
-SSD to negate the effect of disk I/O on shuffle time.}.
+For all our experiments we use an AMD Opteron 6168 with 48 x86\_64 cores, with
+each core clocked at 2 GHz with a 512 KB cache. The system has 64 GB of DDR3
+RAM, 1 TB of HDD, and 1 Gbps network connectivity. In addition, the system is
+also provisioned with a 256 GB solid state drive\footnote{We use the SSD to
+negate the effect of disk I/O on shuffle time.}.
 
 On the software side, the system is running a Debian-based Linux kernel version
 3.2.x.x. We use Linux Containers
@@ -939,26 +971,35 @@ usage of each worker, we poll the \texttt{/proc} filesystem. Unless otherwise
 stated, all application data (input, intermediate, and output) is stored on the
 SSD.
 
-\section{Performance of CIEL on different workloads}
-We first analyze the performance of a sort application. Our goal is to study the
-effect of data size on the shuffle and the overall job completion time.
-A 20 GB text dataset was synthetically generated to ensure equal partitioning
-and equal distribution of keys, i.e. task times are not biased by unequal work
-distribution. Each file in the dataset is 64 GB in size, with 640 files in
-total. Each file was given as input to a single map task while the number of
-reduce tasks was kept constant at 40\footnote{One per CIEL worker.}. Each CIEL
-worker was configured for a single task slot.
+\section{Analysis of network behaviour of CIEL on different workloads}
+To gain some insight into the network behaviour of CIEL, we first conduct a
+series of experiments using an I/O-intensive and a CPU-intensive application.
+For the former we use sort and for the latter we use \emph{k}-means clustering.
 
-The same experiment was run for 3 different topologies.
+\subsection{Sort}
+In our sort implementation, the map and reduce functions are identity when the
+underlying framework itself performs the actual sort.In this experiment, our
+goal is to study the effect of data size on the shuffle and the overall job
+completion time. A 20 GB text dataset was synthetically generated to ensure
+equal partitioning and equal distribution of keys, i.e. task times are not
+biased by unequal work distribution. Each file in the dataset is 64 GB in size,
+with 640 files in total. Each file was given as input to a single map task while
+the number of reduce tasks was kept constant at 40\footnote{One per CIEL
+worker.}. Each CIEL worker was configured for a single task slot. In this setup,
+all 41 containers are connected to the same switch.
 
-\subsection{Star topology - Single rack}
-In this setup, all 41 containers are connected to the same switch. 
-
-\begin{figure}[h]
+\begin{figure}[h!]
   \centering
     \includegraphics[width=0.8\textwidth]{sort.eps}
-    \caption{Sort - Job Completion Time - Star topology}
+    \caption{Sort - Job Completion Time}
     \label{chap:eval:sec:ciel:fig:sort}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.8\textwidth]{sort_phase.eps}
+    \caption{Sort - Phase-wise Job Completion Time}
+    \label{chap:eval:sec:ciel:fig:sortphase}
 \end{figure}
 
 Figure~\ref{chap:eval:sec:ciel:fig:sort} shows the results of 10 runs of sort
@@ -967,20 +1008,13 @@ increases with the increase in input. A phase-wide breakdown of the job
 completion time in Figure~\ref{chap:eval:sec:ciel:fig:sortphase} reveals that
 the shuffle phase accounts for up to half of the time.
 
-\begin{figure}[h]
-  \centering
-    \includegraphics[width=0.8\textwidth]{sort_phase.eps}
-    \caption{Sort - Phase-wise Job Completion Time - Star topology}
-    \label{chap:eval:sec:ciel:fig:sortphase}
-\end{figure}
-
 To understand the effect of the application on system resources, we plot the CPU
 and network usage of sort for inputs data of size 2, 10, and 20 GB in
 Figure~\ref{chap:eval:sec:ciel:fig:sortres}. We see that there's a spike in
 network traffic during the shuffle phase while otherwise the network is
 under-utilized.
 
-\begin{figure}
+\begin{figure}[h!]
         \begin{subfigure}[b]{0.33\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{32maps.csv.eps}
@@ -1003,11 +1037,15 @@ under-utilized.
         \label{chap:eval:sec:ciel:fig:sortres}
 \end{figure}
 
+\subsection{\emph{k}-means clustering}
 We now consider \emph{k}-means clustering, a CPU intensive application. This
 application takes advantage of CIEL's dynamic task generation by iteration till
 the result is within an acceptable value. The CIEL port of this application is
-identical to its Mahout~\footnote{\url{http://mahout.apache.org/}}
-implementation without requiring an external driver. To evaluate this
+identical to its Mahout\footnote{\url{http://mahout.apache.org/}}
+implementation without requiring an external driver. The map function assigns
+each input point to its nearest cluster based on a distance metric. The reduce
+function sums up the values and checks if they have converged. In case they have
+not, it launches the next iteration of the application. To evaluate this
 application, we generated 64 MB cluster files with 80,000 dense vectors and
 \emph{k}, cluster center, value of 100. Each vector contains 100
 double-precision values~\cite{Murray:2011:CUE}.
@@ -1018,16 +1056,16 @@ execution time of \emph{k}-means shoots up with an increase in input. This is
 due to CPU intensive nature of the application as well as the dynamic task
 generation. The CPU and network usage of the application is shown in
 Figure~\ref{chap:eval:sec:ciel:fig:kmeans}. Again in contrast to sort, we see
-network and CPU activity throughput the course of the execution.
+network and CPU activity throughout the course of the execution.
 
 \begin{figure}[h!]
   \centering
     \includegraphics[width=0.8\textwidth]{kmeans_sort.eps}
-    \caption{Sort and k-means Job Completion Time - Star topology}
+    \caption{Sort and \emph{k}-means Job Completion Time}
     \label{chap:eval:sec:ciel:fig:kmeans}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h!]
         \begin{subfigure}[b]{0.33\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{kmeans32.csv.eps}
@@ -1046,42 +1084,164 @@ network and CPU activity throughput the course of the execution.
                 \caption{10 GB}
                 \label{fig:10GBsortres}
         \end{subfigure}
-        \caption{CPU and Network usage of kmeans}
+        \caption{CPU and Network usage of \emph{k}-means}
         \label{chap:eval:sec:ciel:fig:kmeansres}
 \end{figure}
 
-\begin{figure}[h!]
+\section{Performance of CIEL using different transport semantics}
+ \begin{figure}[h!]
   \centering
     \includegraphics[width=0.8\textwidth]{sort_bonding.eps}
-    \caption{Sort - Job Completion Time - Star topology}
+    \caption{Sort with Bonding - Job Completion Time - Star topology}
     \label{chap:eval:sec:ciel:fig:sortbonding}
 \end{figure}
 
 \begin{figure}[h!]
   \centering
     \includegraphics[width=0.8\textwidth]{shuffle_bonding_no_bonding.eps}
-    \caption{Sort - Shuffle Time - Star topology}
+    \caption{Sort with Bonding - Shuffle Time - Star topology}
     \label{chap:eval:sec:ciel:fig:sortshuffle}
 \end{figure}
 
-\subsection{Tree topology - Two racks}
-\subsection{Tree topology - Four rack}
+In this section we evaluate the performance of CIEL under different transport
+semantics.
+
+\subsection{Ethernet Bonding}
+We first evaluate Ethernet bonding. We add an extra interface to each container
+and use the \texttt{bonding} module in Linux to bond both interfaces per
+container. To stripe traffic from the same TCP connection over the interfaces,
+we make use of the \texttt{balance-rr} bonding mode.
+Figure~\ref{chap:eval:sec:ciel:fig:sortbonding} shows the job completion time of
+CIEL sort with and without Ethernet bonding. Both methods exhibit the same
+behaviour.
+
+To gain more insight, in Figure~\ref{chap:eval:sec:ciel:fig:sortbonding} we only
+focus on the shuffle time. On average, Ethernet bonding improves shuffle time
+by 9\%.
+
+\subsection{Multiple Paths}
+MPTCP vs. Ethernet bonding
+
+MPTCP vs. Ethernet bonding incase of path failure
+
+\subsection{Delay-based vs. AQM-based congestion control}
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.8\textwidth]{shuffle_sort_dctcp.eps}
+    \caption{Sort TCP vs. DCTCP - Shuffle Time - Star topology}
+    \label{chap:eval:sec:ciel:fig:sortshuffledctcp}
+\end{figure}
+
+We now investigate whether active queue management (AQM)-based congestion
+control can outperform the standard delay-based one. In the former, RTT
+measurements are used as an indication of congestion while in the latter,
+explicit feedback from the switches is employed. We use data center TCP
+(DCTCP)~\cite{Alizadeh:2010:DCT} as a representative protocol for AQM.
+Figure~\ref{chap:eval:sec:ciel:fig:sortshuffledctcp} plots the performance of
+standard delay-based TCP against AQM-based DCTCP on our sort application. DCTCP
+reduces the shuffle time by 20\% on average as it achieves higher throughput.
+
+Figure~\ref{chap:eval:sec:ciel:fig:sortresdctcp} shows the CPU and network
+utilization under DCTCP. In contrast to
+Figure~\ref{chap:eval:sec:ciel:fig:sortres} we see that network traffic spikes
+are closely packed which results in higher throughput. This can be attributed to
+DCTCP's ability to trade convergence for higher throughput. To achieve this,
+DCTCP sources incrementally adjust their window size based on the extent of
+congestion. In contrast, TCP throughput has more variation  At the same time we
+note that TCP ensures more fairness for individual flows.
+Table~\ref{chap:eval:sec:ciel:tab:jain} shows the Jain's fairness
+index~\cite{Jain:1984:AQM} for both TCP and DCTCP. TCP's fairness is on average
+0.05 higher than DCTCP. For shorter flows DCTCP does not converge quickly, as a
+result it does not achieve fair share equilibrium. For larger flows the fairness
+index of DCTCP matches that of TCP due to adequate time to converge to
+equilibrium.
+
+\begin{figure}[h!]
+        \begin{subfigure}[b]{0.33\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{32maps_dctcp.csv.eps}
+                \caption{2 GB - 32 maps}
+                \label{fig:2GBsortresdctcp}
+        \end{subfigure}%
+        \begin{subfigure}[b]{0.33\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{160maps_dctcp.csv.eps}
+                \caption{10 GB - 160 maps}
+                \label{fig:10GBsortresdctcp}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.33\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{320maps_dctcp.csv.eps}
+                \caption{20 GB - 320 maps}
+                \label{fig:20GBsortresdctcp}
+        \end{subfigure}
+        \caption{CPU and Network usage of sort using DCTCP}
+        \label{chap:eval:sec:ciel:fig:sortresdctcp}
+\end{figure}
+
+\begin{table}
+                \centering
+  \begin{tabular}{| l || l | l |}
+    \hline
+	Data Size (GB) & DCTCP & TCP \\ \hline
+    2 & 0.799 & 0.793 \\ \hline
+    4 & 0.902 & 0.904 \\ \hline
+    6 & 0.801 & 0.943 \\ \hline
+    8 & 0.759 & 0.964 \\ \hline
+    10 & 0.896 & 0.938 \\ \hline
+    12 & 0.910 & 0.945 \\ \hline
+    14 & 0.924 & 0.968 \\ \hline
+    16 & 0.940 & 0.965 \\ \hline
+    18 & 0.958 & 0.969 \\ \hline
+    20 & 0.944 & 0.955 \\ \hline \hline
+    Average & 0.883 & 0.934 \\
+    \hline
+  \end{tabular}
+  \caption{Jain's fairness index for DCTCP and TCP}
+  \label{chap:eval:sec:ciel:tab:jain}
+\end{table}
+
+\subsection{Transport Encryption}
+TCPcrypt vs. TCP
+
+TCPcrypt vs. SSH
 
 \section{Performance of CIEL on different workloads using Mission Control}
-\section{Performance of Isis2 stuff}
+
+\subsection{Tree topology - Two racks}
+\subsection{Tree topology - Four racks}
+
+\section{Performance of Virtual Synchrony primitives}
+- Multicast time
+
+- Time taken by Mission Control to shift to a new transport
+
+- Overhead of Isis2
+
+- IronPython vs. cPython
 
 \chapter{Summary and Conclusions}\label{chapter:conclusion}
 
- 
-- Streaming, switching to shared memory pipes if the source/destination is
-local. Pointer to reconfigurable I/O channels?
+Future work:
 
-- Possibly merge with Mesos~\cite{Hindman:2011:MPF} and
-Akaros~\cite{Rhoden:2011:IPE} or Quincy~\cite{Isard:2009:QFS}.
-
-- 80\% of the traffic stays within a rack~\cite{Benson:2010:NTC}, can we
+\begin{itemize}
+  \item Recent work~\cite{Smith:2012:TCF} has shown that I/O throughput
+	and latency can vary significantly (order of magnitude) due to the underlying
+	IPC mechanism, the physical and virtual architecture, and OS primitives.
+	Mission Control can be run on top of the proposed \textsc{fable} stack to
+	switch to shared memory primitives if the destination is local.
+   \item Mission Control can be merged with Quincy~\cite{Isard:2009:QFS} and
+   Mesos~\cite{Hindman:2011:MPF} to enable data center/cluster-wide CPU, memory
+   and I/O isolation and scheduling.
+   \item It would interesting to see how Mission Control can be used to leverage
+   the transparency of the software stack in Akaros~\cite{Rhoden:2011:IPE} to
+   improve I/O performance.
+   \item 80\% of the traffic stays within a rack~\cite{Benson:2010:NTC}, can we
 optimize it?
-
+	\item Evaluation in a shared environment.
+	\item Multiple frameworks?
+	\item Bandwidth vs. latency~\cite{Alizadeh:2012:LIM}.
+\end{itemize}
 
 \appendix
 \singlespacing
