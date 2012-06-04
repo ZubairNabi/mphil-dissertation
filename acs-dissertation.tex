@@ -918,19 +918,56 @@ We first enumerate a set of goals for Mission Control:
 In light of the goals presented in the previous section, we now describe the
 design of Mission Control.
 
-\textsf{TODO:}
+Architecturally, Mission Control consists of three key components: (1) Mission
+Controller (MC), (2) Flight Controller (FC), and (3) Throttle Controller (TC).
+These components are described in detail below.
 
-1. Similar in architecture to target frameworks: One master, many workers.
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.8\textwidth]{MissionControl.eps}
+    \caption{Mission Control architecture}
+    \label{chap:design:fig:missioncontrol}
+\end{figure}
 
-2. Master works as a centralized scheduler: Mission Control.
+\subsection{Mission Controller}
+CIEL is capable of running multiple jobs at the same time. Mission Controller
+resides alongside the CIEL master and coordinates transfer scheduling across
+these jobs. To this end, it uses \emph{weighted fair sharing} to assign each
+transfer a weight. In practice, this allows the sharing of each link in the
+network proportional to these weights. In addition, weighted fair sharing
+subsumes several policies including FIFO and priority~\cite{Chowdhury:2011:MDT}.
+The values of these weights are subject to organizational goals and can be
+calibrated on the basis of user profiles or job characteristics. For example,
+jobs launched by \emph{Alice} can be given twice the priority of those launched
+by \emph{Bob}. In the same vein, low latency jobs can be given higher priority
+than batch-processing jobs. Similarly, to enable FIFO, weights can be assigned
+proportional to job arrival time. More importantly, Mission Controller maintains
+cluster-wide state of resources and selects the transport layer protocol for a
+particular transfer.
 
-3. Workers have flight controllers which deal with local state.
+\textsf{TODO: When and how to select a transport?}
 
-4. Works at the application layer.
+\textsf{TODO: How to get user constraints?}
 
-5. Model: Transfer foo to bar.
+\subsection{Flight Controller}
+Each transfer is associated with a Flight Controller that handles transport
+specific resources. To this end, each FC implements the control plane of a
+particular transport protocol and its various parameters.
+For example, the multipath TCP FC selects the number of flows per TCP
+connection. Each FC is registered with the Mission Controller and receives its
+weight assignment. It is important to highlight that to change the transport
+protocol at runtime, the Mission Controller unregisters the existing FC for a
+transfer and replaces it with a corresponding FC for the new protocol.
 
-\textsf{TODO: Figure}
+\subsection{Throttle Controller}
+Unlike the Mission Controller and Flight Controller(s), which reside on the
+master node, Throttle Controllers are present at every worker. Each TC receives
+its transfer schedule from the FC and uses that information to handle all flows
+on the worker. Each TC receives information for each FC (or job) for which it
+has to schedule a transfer (or task). As a result, Throttle Controllers have to
+maintain both scheduling and transport parameter state for each local flow.
+Figure~\ref{chap:design:fig:missioncontrol} illustrates the architecture of
+Mission Control.
 
 \section{Implementation}
 \textsf{TODO:}
