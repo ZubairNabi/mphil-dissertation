@@ -7,7 +7,7 @@
 
 #Output
 *.dvi
-*.pdf
+#*.pdf
 *.ps
 
 #Eclipse/TeXlipse junk
