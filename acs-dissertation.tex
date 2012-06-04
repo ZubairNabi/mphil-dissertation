@@ -201,7 +201,7 @@ is suboptimal~\cite{Benson:2010:CFT}.
 
 Another major shortcoming of TCP, which is manifest in the data center, is TCP
 throughput collapse, or
-\emph{Incast}~\cite{Chen:2009:UTI,Vasudevan:2009:SEF,Wu:2010:IIC,Alizadeh:2010:DCT}.
+\emph{incast}~\cite{Chen:2009:UTI,Vasudevan:2009:SEF,Wu:2010:IIC,Alizadeh:2010:DCT}.
 This can cause overall application throughput to decrease by up to
 90\%~\cite{Vasudevan:2009:SEF}. Typically, to handle incast, application-level
 remedies are added which include varying the size of the packets so that a large
@@ -222,7 +222,7 @@ altogether. For instance, Facebook~\cite{Facebook} now uses a custom UDP
 transport. Some researchers have gone to the extent of suggesting that fixing
 TCP is tantamount to ``saving the world''~\cite{Lyon:2008:TII}\footnote{Heat and
 CO$_{2}$ emissions and radioactive waste can be accounted to TCP's
-inefficiency}. For completeness, it is worth noting that TCP was designed as a
+inefficiency.}. For completeness, it is worth noting that TCP was designed as a
 general transport mechanism for a wide area network (WAN)~\cite{Clark:1988:DPD}
 and has experienced near universal adoption in environments as diverse as
 satellites~\cite{Henderson:1999:TPF}. This is primarily due to TCP's ability to
@@ -362,12 +362,12 @@ express data-dependent control flow. It provides primitives to loop over
 expressions or call them recursively. In addition, scripting primitives can be
 used to spawn and execute tasks, and de-reference data (reminiscent of pointers
 in C/C++). Further, it provides library functions to express the flow of other
-frameworks such as MapReduce, as CIEL subsumes both MapReduce, and Dryad.
+frameworks such as MapReduce, as CIEL subsumes both MapReduce and Dryad.
 Architecturally, CIEL is similar to MapReduce and Dryad, in that it also has a
 single master and several worker nodes, with the former in charge of computation
 state, and the latter in charge of the actual computation.
-CIEL relies on three primitives--objects, references, and tasks--for dynamic
-task graphs. Specifically, objects are data sequences that are used for input,
+CIEL relies on three primitives -- objects, references, and tasks -- for dynamic
+task graphs. Specifically, objects are data sequences that are used for input
 and are generated as output. Objects which have not been fully computed yet, can
 be used as references. Further, tasks are the unit of computation and
 scheduling. Tasks use programmatic code, or binaries to execute over all its
@@ -376,6 +376,8 @@ alternatively, spawn other tasks to do so. Tasks can be executed in either
 \emph{eager}, or \emph{lazy} fashion, with the latter being the default
 strategy. Finally, CIEL uses a number of optimizations to improve performance
 such as deterministic naming, and streaming.
+Figure~\ref{chap:intro:fig:frameworks} highlights the major differences between
+the three frameworks.
 
 \begin{figure}[h!]
         \begin{subfigure}[b]{0.4\textwidth}
@@ -596,30 +598,31 @@ which lie at the heart of batch processing systems such as MapReduce:
 assignment (WFA) enabled by an appropriate number of multiple TCP connections
 and TCP's AIMD fair sharing while for the latter it leverages a BitTorrent-like
 algorithm. Architecturally, it is a centralized application layer controller for
-both intra and inter-transfer communication. The former is managed by one or
+both intra- and inter-transfer communication. The former is managed by one or
 more Transfer Controllers (TCs) while the latter is managed by an Inter-transfer
 Controller (ITC). The TC continuously monitors the transfer and updates the set
-of sources associated with each destination. TCs manage the transfer at the
-granularity of flows, by choosing how many concurrent flows to open from each
-node, which destinations to open them to, and when to move each chunk of data.
-While the results from Orchestra are promising, it is still suboptimal due to
-its reliance on TCP. In addition, frameworks like Dryad support TCP pipes, and
-shared memory FIFO for communication in addition to transfer of files over the
-network, while Orchestra only considers the last of these.
+of sources associated with each destination. Specifically, the TC manages the
+transfer at the granularity of flows, by choosing how many concurrent flows to
+open from each node, which destinations to open them to, and when to move each
+chunk of data. While the results from Orchestra are promising, it is still
+suboptimal due to its reliance on TCP. In addition, frameworks like Dryad
+support TCP pipes, and shared memory FIFO for communication in addition to
+transfer of files over the network, while Orchestra only considers the last of
+these.
 
 In contrast to all of these systems, Mission Control uses the diversity in
 transport protocols to achieve optimum routing and congestion control.
 
 \section{Transport Protocols}
-In this section we enumerates transport protocols which are supported by Mission
-Control.
+In this section we enumerate transport protocols which address some of
+TCP's shortcomings.
 
 Deadline-Driven Delivery (D$^3$)~\cite{Wilson:2011:BNL} is a data
 center-specific version of TCP that targets applications with distributed
 workflow and latency targets. These applications associate a deadline with each
 network flow and the flow is only useful if the deadline is met\footnote{TCP on
 the other hand tries to achieve global fairness and maximize throughput while
-remaining agnostic to any flow specific deadline.}. To this end, applications
+remaining agnostic to any flow-specific deadline.}. To this end, applications
 expose flow deadline and size information which is exploited by end hosts to
 request rates from routers along the data path. Routers only maintain aggregate
 counters and thus, do not maintain any per-flow state. As a result, they are
@@ -630,7 +633,7 @@ Mission Control can use D$^3$ for applications that expose explicit deadline
 information.
 
 Data Center TCP (DCTCP)~\cite{Alizadeh:2010:DCT} uses Explicit Congestion
-Notifications (ECN) from switches to perform active queue management based
+Notifications (ECN) from switches to perform active queue management-based
 congestion control. Specifically, it uses the congestion experienced flag in
 packets---set by switches whenever the buffer occupancy exceeds a small
 threshold---to reduce the size of the window based on a fraction of the marked
@@ -640,7 +643,7 @@ Therefore, Mission Control enables DCTCP if it detects that switches in the
 network support ECN. A spin-off architecture is HULL~\cite{Alizadeh:2012:LIM},
 high-bandwidth ultra-low latency, that aims to make a trade-off between
 bandwidth and latency for low-latency applications in a shared environment. To
-this end, it reduces network buffering by replacing queue occupancy based
+this end, it reduces network buffering by replacing queue occupancy-based
 congestion control with link utilization. It makes use of \emph{phantom queues}
 which give the illusion of draining a link at less than its actual rate.
 End-hosts employing DCTCP experience reduced transmission rate based on ECN from
@@ -707,9 +710,9 @@ within a rack and on average, a server communicates with two servers within its
 rack and four outside the rack. With respect to congestion, their study shows
 that highly utilized links are prevalent and congestion can last from 10s of
 seconds to 100s. In addition, most periods of congestion are short lived.
-Further, during periods of congestion there is an increase in the number of work
-failures. Finally, traffic patterns change both frequently and quickly over
-time. Following in the footsteps of Kandula et al., Benson et
+Further, during periods of congestion there is an increase in the number of
+worker failures. Finally, traffic patterns change both frequently and quickly
+over time. Following in the footsteps of Kandula et al., Benson et
 al.~\cite{Benson:2009:UDC}, present SNMP data from 19 data centers. Their
 analysis shows that traffic load is high in the core and decreases towards the
 edge. At the same time, link loses are higher near the edge and decrease towards
@@ -752,7 +755,7 @@ centers~\cite{{Halperin:2011:ADC,Kandula:2009:FTD}}. The high cost and technical
 challenges of newer topologies can be avoided by provisioning the network for
 the average case and avoiding hotspots by adding additional links on the fly.
 The key challenge is to choose the placement and duration of \emph{flyways}.
-In this proposals, flyways are constructed using Multi-Gigabit wireless links,
+In these proposals, flyways are constructed using Multi-Gigabit wireless links,
 controlled by a centralized scheduler that decides the temporal and spatial
 placement of wireless links based on observed traffic. On major shortcoming of
 this approach is that in cases where the traffic has high churn, the controller
@@ -781,16 +784,16 @@ optical paths for hotspots, if required.
 To take advantage of economies of scale and achieve optimum resource
 utilization, most data centers are virtualized. As a result, resources are
 shared amongst the tenants, which can lead to contention and other undesired
-behvaiour.
+behaviour.
 
 Due to VM consolidation, the RTT of TCP connections to VMs increases
 significantly, causing the latency of connections to go up. vSnoop is a system
 that allows the driver domain of a host to send an acknowledgement on behalf of
-the VMs~\cite{Kangarlou:2010:VIT}. It snoops on all traffic VM traffic and
-maintains per-flow state for each TCP connection which it then uses to enable
-early acknowledgement of packets. The same problem afflicts the transmit path as
-well, as TCP acknowledgements can get delayed, causing the TCP congestion window
-to grow more slowly. To mitigate this, vFlood is another extension that offloads
+the VMs~\cite{Kangarlou:2010:VIT}. It snoops on all VM traffic and maintains
+per-flow state for each TCP connection which it then uses to enable early
+acknowledgement of packets. The same problem afflicts the transmit path as well,
+as TCP acknowledgements can get delayed, causing the TCP congestion window to
+grow more slowly. To mitigate this, vFlood is another extension that offloads
 congestion control to the driver domain, which allows the buffering of a high
 number of packets~\cite{Gamage:2011:OFI}. Regardless of the transport protocol,
 Mission Control can delegate congestion control to the driver domain in
@@ -823,7 +826,7 @@ bandwidth is non-trivial for most applications as bandwidth is a function of
 their communication pattern. Oktupus~\cite{Ballani:2011:TPD} is a resource
 allocator that uses ``virtual networks'' as an abstraction to expose to users.
 This allows the cloud provider to decouple the virtual network and the
-underlying physical network. As a result, there is a tradeoff between
+underlying physical network. As a result, there is a trade-off between
 application goals for performance and provider goals for optimum utilization of
 resources. For all-to-all communication, such as MapReduce traffic, a
 \emph{virtual cluster} is employed which provides the illusion of all virtual
@@ -836,7 +839,7 @@ rate-limiting at the end hosts is employed to control bandwidth.
 
 In this work we do not explicitly tackle VM rate limiting, but Mission Control
 as an architecture can be used to rate limit ingress and egress links at the
-application layer.
+application layer by controlling the transport schedule.
 
 \section{Energy Efficiency and Security}
 In addition to performance and fairness, energy efficiency and security are of
@@ -867,7 +870,7 @@ Finally, applications can also be made aware of the presence of TCPcrypt to
 negate redundant encryption. We use TCPcrypt as a secure transport protocol
 option in Mission Control.
 
-To summarize, novel data center topologies in practice do no achieve
+In summary, novel data center topologies in practice do no achieve
 full-bisection bandwidth due to their reliance on TCP. In fact, in some cases
 full-bisection bandwidth is overkill and the needs of most applications can be
 satisfied by using a few additional links. Extensions to Ethernet can address
@@ -880,7 +883,8 @@ aggressive use of \emph{combiners} can only reduce traffic to a certain extent.
 Finally, rate limiters expect users to know the bandwidth requirements of their
 applications beforehand. This is impractical as the prediction of network
 traffic is non-trivial and application requirements are dynamic over the course
-of their execution.
+of their execution. Mission Control addresses the shortcomings of all of these
+systems by enabling diversity in both transport semantics and scheduling.
 
 \chapter{Design and Implementation}\label{chapter:designImplementation}
 In this section, we present the design and implementation of Mission Control.
@@ -901,28 +905,34 @@ We first enumerate a set of goals for Mission Control:
   Control should also work on the same principles.
   \item Data intensive computing frameworks these days scale to thousands of
   worker nodes. In addition, their architecture enables them to seamlessly,
-  scale-up and scale-dow. Therefore, Mission Control should not limit the
+  scale-up and scale-down. Therefore, Mission Control should not limit the
   scalability of these systems.
   \item Like mentioned earlier, bandwidth is a constrained resource in the data
   center. Mission Control should only add minimal control traffic to the mix. To
-  this end, it should make ensure of multicast whenever possible.
+  this end, it should make use of multicast whenever possible.
 \end{enumerate}
 
 \section{Design}
 In light of the goals presented in the previous section, we now describe the
 design of Mission Control.
 
+\textsf{TODO:}
+
 1. Similar in architecture to target frameworks: One master, many workers.
 
-2. Master workers as a centralized scheduler.
+2. Master works as a centralized scheduler: Mission Control.
 
-3. No change to physical infrastructure.
+3. Workers have flight controllers which deal with local state.
 
-4. Application layer.
+4. Works at the application layer.
 
-5. Scalable.
+5. Model: Transfer foo to bar.
+
+\textsf{TODO: Figure}
 
 \section{Implementation}
+\textsf{TODO:}
+
 Different Kernels, Isis2, Python, C\#, and IronPython.
 
 Supported protocols: TCP, Weighted TCP (Orchestra-like), MPTCP, DCTCP, TCPcrypt,
@@ -941,6 +951,8 @@ which implements a virtually synchronous version of
 Paxos~\cite{Lamport:1998:PP}.
 
 \chapter{Evaluation}\label{chapter:evaluation}
+This section presents a thorough evaluation of Mission Control. We first
+describe the testbed.
 
 \section{Testbed}
 For all our experiments we use an AMD Opteron 6168 with 48 x86\_64 cores, with
@@ -960,7 +972,7 @@ addition, the former was provisioned with 100 GB of HDD space in the form of a
 logical volume while the latter were provisioned with 20 GB of the same each.
 The SSD is shared by all. Finally,
 OpenVSwitch~\cite{Pfaff:2009:ENI}\footnote{\url{http://openvswitch.org/download/}}
-was used as the L2 fabric.
+is used as the L2 fabric.
 
 For all our experiments, we use a custom MapReduce Java library written for
 CIEL\footnote{\url{https://github.com/ZubairNabi/ciel-java/tree/master/examples/src/main/java/com/asgow/ciel/examples/mapreduce}}.
@@ -977,15 +989,15 @@ series of experiments using an I/O-intensive and a CPU-intensive application.
 For the former we use sort and for the latter we use \emph{k}-means clustering.
 
 \subsection{Sort}
-In our sort implementation, the map and reduce functions are identity when the
-underlying framework itself performs the actual sort.In this experiment, our
+In our sort implementation, the map and reduce functions are identity while the
+underlying framework itself performs the actual sort. In this experiment, our
 goal is to study the effect of data size on the shuffle and the overall job
 completion time. A 20 GB text dataset was synthetically generated to ensure
 equal partitioning and equal distribution of keys, i.e. task times are not
 biased by unequal work distribution. Each file in the dataset is 64 GB in size,
-with 640 files in total. Each file was given as input to a single map task while
-the number of reduce tasks was kept constant at 40\footnote{One per CIEL
-worker.}. Each CIEL worker was configured for a single task slot. In this setup,
+with 640 files in total. Each file is given as input to a single map task while
+the number of reduce tasks is kept constant at 40\footnote{One per CIEL
+worker.}. Each CIEL worker is configured for a single task slot. In this setup,
 all 41 containers are connected to the same switch.
 
 \begin{figure}[h!]
@@ -1006,11 +1018,11 @@ Figure~\ref{chap:eval:sec:ciel:fig:sort} shows the results of 10 runs of sort
 for input data size varied from 2 GB to 20 GB. The job completion time linearly
 increases with the increase in input. A phase-wide breakdown of the job
 completion time in Figure~\ref{chap:eval:sec:ciel:fig:sortphase} reveals that
-the shuffle phase accounts for up to half of the time.
+the shuffle phase accounts for up to half of the total time.
 
 To understand the effect of the application on system resources, we plot the CPU
-and network usage of sort for inputs data of size 2, 10, and 20 GB in
-Figure~\ref{chap:eval:sec:ciel:fig:sortres}. We see that there's a spike in
+and network usage of sort for input data of size 2, 10, and 20 GB in
+Figure~\ref{chap:eval:sec:ciel:fig:sortres}. We see that there is a spike in
 network traffic during the shuffle phase while otherwise the network is
 under-utilized.
 
@@ -1039,23 +1051,23 @@ under-utilized.
 
 \subsection{\emph{k}-means clustering}
 We now consider \emph{k}-means clustering, a CPU intensive application. This
-application takes advantage of CIEL's dynamic task generation by iteration till
+application takes advantage of CIEL's dynamic task generation by iterating till
 the result is within an acceptable value. The CIEL port of this application is
-identical to its Mahout\footnote{\url{http://mahout.apache.org/}}
-implementation without requiring an external driver. The map function assigns
-each input point to its nearest cluster based on a distance metric. The reduce
-function sums up the values and checks if they have converged. In case they have
-not, it launches the next iteration of the application. To evaluate this
-application, we generated 64 MB cluster files with 80,000 dense vectors and
-\emph{k}, cluster center, value of 100. Each vector contains 100
-double-precision values~\cite{Murray:2011:CUE}.
+identical to its Mahout\footnote{\url{http://mahout.apache.org/}} implementation
+without requiring an external driver. The map function assigns each input point
+to its nearest cluster based on a distance metric. The reduce function sums up
+the values and checks if they have converged. In case they have not, it launches
+the next iteration of the application. To evaluate this application, we
+generated 64 MB cluster files with 80,000 dense vectors and \emph{k}, cluster
+center, value of 100. Each vector contains 100 double-precision
+values~\cite{Murray:2011:CUE}.
 
 Figure~\ref{chap:eval:sec:ciel:fig:kmeans} plots the job completion time of
 \emph{k}-means as a function of the input data size. In contrast to sort, the
 execution time of \emph{k}-means shoots up with an increase in input. This is
-due to CPU intensive nature of the application as well as the dynamic task
+due to the CPU intensive nature of the application as well as the dynamic task
 generation. The CPU and network usage of the application is shown in
-Figure~\ref{chap:eval:sec:ciel:fig:kmeans}. Again in contrast to sort, we see
+Figure~\ref{chap:eval:sec:ciel:fig:kmeansres}. Again in contrast to sort, we see
 network and CPU activity throughout the course of the execution.
 
 \begin{figure}[h!]
@@ -1115,7 +1127,7 @@ Figure~\ref{chap:eval:sec:ciel:fig:sortbonding} shows the job completion time of
 CIEL sort with and without Ethernet bonding. Both methods exhibit the same
 behaviour.
 
-To gain more insight, in Figure~\ref{chap:eval:sec:ciel:fig:sortbonding} we only
+To gain more insight, in Figure~\ref{chap:eval:sec:ciel:fig:sortshuffle} we only
 focus on the shuffle time. On average, Ethernet bonding improves shuffle time
 by 9\%.
 
