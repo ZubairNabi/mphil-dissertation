@@ -613,7 +613,9 @@ transfer of files over the network, while Orchestra only considers the last of
 these.
 
 In contrast to all of these systems, Mission Control uses the diversity in
-transport protocols to achieve optimum routing and congestion control.
+transport protocols to achieve optimum routing and congestion control. At the
+same time, the architecture of Mission Control is inspired by the architecture
+of Orchestra.
 
 \section{Transport Protocols}
 In this section we enumerate transport protocols which address some of
@@ -941,9 +943,23 @@ calibrated on the basis of user profiles or job characteristics. For example,
 jobs launched by \emph{Alice} can be given twice the priority of those launched
 by \emph{Bob}. In the same vein, low latency jobs can be given higher priority
 than batch-processing jobs. Similarly, to enable FIFO, weights can be assigned
-proportional to job arrival time. More importantly, Mission Controller maintains
-cluster-wide state of resources and selects the transport layer protocol for a
-particular transfer.
+proportional to job arrival time. By default we use performance-centric network
+allocation to maximize parallelism~\cite{Kumar:2012:ACF}. For shuffle transfers
+allocation is made on the basis of the number of target machines while per-flow
+allocation is used for broadcast transfers. Concretely,
+
+\begin{equation}
+  share_{shuffle} = N
+\end{equation}
+
+\begin{equation}
+  share_{broadcast} = N^2
+\end{equation}
+
+Where $N$ is the number of machines that the job uses.
+
+More importantly, Mission Controller maintains cluster-wide state of resources
+and selects the transport layer protocol for a particular transfer.
 
 \textsf{TODO: When and how to select a transport?}
 
