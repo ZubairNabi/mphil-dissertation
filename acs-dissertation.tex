@@ -1269,9 +1269,22 @@ equilibrium.
 \end{table}
 
 \subsection{Transport Encryption}
-TCPcrypt vs. TCP
-
-TCPcrypt vs. SSH
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.8\textwidth]{shuffle_sort_tcpcrypt.eps}
+    \caption{Sort TCP vs. TCPcrypt - Shuffle Time - Star topology}
+    \label{chap:eval:sec:ciel:fig:sortshuffletcpcrypt}
+\end{figure}
+In cases where the same framework is being used by multiple users without any
+VLAN isolation, users might want to protect their data by enforcing encryption.
+This can be done at the application layer but that would result in a very high
+overhead. We investigate whether transport layer encryption can be applied with
+an acceptable overhead. We use TCPcrypt as a representative protocol and
+benchmark it against standard TCP.
+Figure~\ref{chap:eval:sec:ciel:fig:sortshuffletcpcrypt} shows the shuffle time
+of both protocols. On average, TCPcrypt results in an 85\% increase in data
+transfer. It is worth noting that we used the user-space implementation of
+TCPcrypt. A kernel-space implementation would potentially decrease the overhead.
 
 \section{Performance of CIEL on different workloads using Mission Control}
 
