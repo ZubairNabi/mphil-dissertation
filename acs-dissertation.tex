@@ -1187,9 +1187,51 @@ focus on the shuffle time. On average, Ethernet bonding improves shuffle time
 by 9\%.
 
 \subsection{Multiple Paths}
-MPTCP vs. Ethernet bonding
+As mentioned earlier, emerging data center topologies aim to provide multiple
+paths between each source and destination pair. In this experiment, we evaluate
+whether multiple-path aware protocols can achieve higher throughput. We use
+MPTCP~\cite{Raiciu:2012:HHC} as a representative protocol. In this experiment we
+benchmark the performance of our sort application using TCP, TCP with bonding,
+and MPTCP. Out setup consists of 9 containers: 1 master and 8 workers. We vary
+the input dataset size between 1 GB and 4GB\footnote{Due to a bug in the MPTCP
+kernel implementation we are unable to scale out beyond 9 hosts.}.
+Figure~\ref{chap:eval:sec:ciel:fig:sortshufflemptcp} plots the shuffle time for
+TCP, TCP with bonding, and MPTCP. Surprisingly, MPTCP performs poorly in
+comparison to standard TCP. We attribute this to 3 factors: (1) Additional
+checksum for data sequence mapping (DSM)~\cite{Raiciu:2012:HHC}, (2) The use of
+short-flows for which MPTCP achieves lower throughput~\cite{Raiciu:2010:DCN},
+and (3) The immaturity of the MPTCP kernel implementation.
+Figure~\ref{chap:eval:sec:ciel:fig:sortresmptcp} shows the CPU and network
+utilization of TCP and MPTCP for a 4 GB dataset. MPTCP does not ramp up to
+achieve the same throughput as TCP. We believe that these results do not
+accurately reflect the true potential of MPTCP and evaluation on a different
+set-up would yield more representative results.
 
-MPTCP vs. Ethernet bonding incase of path failure
+
+ \begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.8\textwidth]{shuffle_sort_mptcp.eps}
+    \caption{Sort TCP vs. MPTCP - Shuffle Time - Star topology}
+    \label{chap:eval:sec:ciel:fig:sortshufflemptcp}
+\end{figure}
+
+\begin{figure}[h!]
+        \begin{subfigure}[b]{0.49\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{64maps_tcp.csv.eps}
+                \caption{TCP}
+                \label{fig:4GBsortrestcp}
+        \end{subfigure}%
+        \begin{subfigure}[b]{0.49\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{64maps_mptcp.csv.eps}
+                \caption{MPTCP}
+                \label{fig:4GBsortresmptcp}
+        \end{subfigure}
+        \caption{CPU and Network usage of sort using MPTCP for a 4 GB dataset}
+        \label{chap:eval:sec:ciel:fig:sortresmptcp}
+\end{figure}
+
 
 \subsection{Delay-based vs. AQM-based congestion control}
 \begin{figure}[h!]
