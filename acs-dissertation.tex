@@ -60,8 +60,8 @@ in Data Intensive Computing}
 Over the course of the last decade, proliferation in web applications (Facebook,
 Twitter etc.), and scientific computing (sensor networks, high energy physics,
 etc.) has resulted in an unparalleled surge in data on the exabyte scale.
-Naturally, the need to store and analyze this data has engendered an ecosystem
-of distributed file systems~\cite{Ghemawat:2003:GFS}, structured and
+Consequently, the need to store and analyze this data has engendered an
+ecosystem of distributed file systems~\cite{Ghemawat:2003:GFS}, structured and
 unstructured data stores~\cite{Chang:2006:BDS,DeCandia:2007:DAH}, and
 data-intensive computing
 frameworks~\cite{Dean:2004:MSD,Isard:2007:DDD,Murray:2011:CUE}. These
@@ -71,8 +71,12 @@ distributed, for diversity and redundancy, and run a wide-variety of loads;
 including user-facing applications, such as email; custom enterprise
 applications, such as authentication services; and large-scale batch-processing
 applications, such as web indexing~\cite{Benson:2010:NTC}. The goal of each data
-center is to provide a multi-tenant environment for energy-, power-, space-, and
-cost-efficient computation, and storage at scale~\cite{Katz:2009:TTB}.
+center is to provide a multi-tenant\footnote{Multi-tenancy applies to both
+public clouds, such as Amazon EC2 and Microsoft Azure, where the resources are
+shared by paying customers and to private clouds, maintained by Google,
+Facebook, etc., where different departments share the same infrastructure.}
+environment for energy-, power-, space-, and cost-efficient computation, and
+storage at scale~\cite{Katz:2009:TTB}.
 
 Typically, data centers are built using commodity, off-the-shelf servers and
 switches to find a sweet spot between performance and cost, and to leverage
@@ -83,18 +87,19 @@ commodity nature, servers and network elements are failure-prone and a failure
 in say, a \emph{core switch} can bring down the entire network. Therefore,
 storage and processing frameworks use a range of methods to deal with this,
 including replication, re-execution, and speculative execution. On the network
-side, the infrastructure predominantly consists of TCP/IP enabled wired links
-connecting cheap switches, although wireless~\cite{Halperin:2011:ADC} and
+side, end-hosts running TCP/IP are connected through cheap switches and wired
+links, although wireless~\cite{Halperin:2011:ADC} and
 optical~\cite{Wang:2010:CPO,Farrington:2010:HHE} links have recently been
 explored. Most data centers are provisioned with 1Gbps and 10Gbps switches with
 L2 Ethernet switched fabric interconnects as opposed to fabrics from the high
 performance computing community such as InfiniBand. Likewise, due to the
-prohibitive cost of high-end switches and routers, bandwidth is a constrained
-resource in the data center. To ensure optimum utilization, subject to
-organizational goals, oversubscription factors\footnote{Oversubscription factor
-is defined as ``the ratio of worst-case achievable aggregate bandwidth among the
-end hosts to the total bisection bandwidth of a particular communication
-topology"~\cite{Al-Fares:2008:SCD}.} in real data centers vary significantly:
+prohibitive cost of high-end switches and routers, as opposed to commodity
+off-the-shelf hardware, bandwidth is a constrained resource in the data center.
+To ensure optimum utilization, subject to organizational goals, oversubscription
+factors\footnote{Oversubscription factor is defined as ``the ratio of worst-case
+achievable aggregate bandwidth among the end hosts to the total bisection
+bandwidth of a particular communication topology"~\cite{Al-Fares:2008:SCD}.} in
+real data centers vary significantly:
 Some are as low as 2:1 while some can get as high as
 147:1~\cite{Benson:2010:NTC}. In the cluster hierarchy, bandwidth increases from
 the edge of the network towards the core (off-rack oversubscription). As a
@@ -130,37 +135,46 @@ abstraction framework that resides at the application layer and selects the
 transport semantics for a particular transfer. Based on runtime parameters,
 underlying topology, and user-supplied constraints, it selects both the
 transport protocol and the schedule for a particular data transfer.
-Data intensive computing frameworks such as MapReduce delegate data transfers to
-Mission Control by specifying a set of files and network destinations. In
-addition, frameworks can also expose a set of constraints, such as the use of
-encryption. Mission Control uses global information to choose an optimum policy
-for each data transfer. We have implemented Mission Control for the
-CIEL~\cite{Murray:2011:CUE} framework.
+Data intensive computing frameworks such as MapReduce~\cite{Dean:2004:MSD} and
+CIEL~\cite{Murray:2011:CUE} delegate data transfers to Mission Control by
+specifying a set of files and network destinations. In addition, frameworks can
+also expose a set of constraints, such as the use of encryption. Mission Control
+uses global information to choose an optimum policy for each data transfer. We
+have implemented Mission Control for the CIEL~\cite{Murray:2011:CUE} framework.
 
 \section{The Case Against TCP in the Data Center}
-Above all, the ossification of the Internet protocol stack at the transport and
-network layer~\cite{Akhshabi:2011:ELP} has also been mimicked by data center
-networks. TCP/IP has become the de-facto ``narrow-waist" of the data center
-network. On the one hand, this has standardized direct communication to/from and
-within the data center without the need for any middleware, but on the other
-hand, it has also spawned a new set of problems unique to the data center
-environment. In the data center, the role of IP at the network layer is minimal,
-as it is only employed for naming and addressing. The only obstacle is address
-assignment which needs to be done manually to encode location/topology
-information within the address. Although manual assignment is tedious and
-error-prone, it can be automated by leveraging the well-defined structure of
-data centers~\cite{Chen:2010:GAA}. In contrast, TCP faces a number of
-pathological challenges due to a significantly different bandwidth-delay
-product, round-trip time (RTT), and retransmission timeout
-(RTO)~\cite{Chen:2009:UTI} than would be experienced in a wide area network
-(WAN). For example, due to the low RTT, the congestion window for each flow is
-very small. As a result, flow recovery through TCP fast retransmit is
-impossible, leading to poor net throughput~\cite{Kandula:2009:NDC}. To
-exacerbate problems, data-intensive computing frameworks (DICF) are bandwidth
-hungry and require all data to be \emph{materialized} before the next stage can
-commence (For example, \emph{shuffle} between Map and Reduce stages). In fact,
-data transfer between stages can account for more than 50\% of the job
-completion time~\cite{Chowdhury:2011:MDT}.
+During the last 3 decades the Internet protocol stack has experienced
+considerable innovation. To keep up with the diverse range of ever-emerging
+applications, a number of physical, data link, and application layer protocols
+have been developed and have stood the test of time. In contrast, IP, TCP, and
+UDP have been entrenched at the network and transport layer, leading to an
+hourglass shaped stack~\cite{Akhshabi:2011:ELP}. This ossification of the
+Internet protocol stack at the transport and network layer has also been
+mimicked by data center networks. TCP/IP has become the de-facto ``narrow-waist"
+of the data center network. On the one hand, this has standardized direct
+communication to/from and within the data center without the need for any
+middleware, but on the other hand, it has also spawned a new set of problems
+unique to the data center environment. In the data center, the role of IP at the
+network layer is minimal, as it is only employed for naming and addressing. The
+only obstacle is address assignment which needs to be done manually to encode
+location/topology information within the address\footnote{DHCP can be used for
+address assignment if only physical IDs, such as MAC addresses, are used
+throughout. Advanced topologies, such as BCube, DCell, and VL2, operate on
+logical IDs, which requires an additional physical-to-logical address encoding
+at the DHCP server.}. Although manual assignment is tedious and error-prone, it
+can be automated by leveraging the well-defined structure of data
+centers~\cite{Chen:2010:GAA}. In contrast, TCP faces a number of pathological
+challenges due to a significantly different bandwidth-delay product, round-trip
+time (RTT), and retransmission timeout (RTO)~\cite{Chen:2009:UTI} than would be
+experienced in a wide area network (WAN). For example, due to the low RTT, the
+congestion window for each flow is very small. As a result, flow recovery
+through TCP fast retransmit is impossible, leading to poor net
+throughput~\cite{Kandula:2009:NDC}. To exacerbate problems, data-intensive
+computing frameworks (DICF) are bandwidth hungry and require all data to be
+\emph{materialized} before the next stage can commence (For example,
+\emph{shuffle} between Map and Reduce stages). In fact, data transfer between
+stages can account for more than 50\% of the job completion
+time~\cite{Chowdhury:2011:MDT}.
 Figure~\ref{chap:introduction:fig:sort_fraction} shows the CDF of a MapReduce
 sort application for different sized datasets (between 2GB and 20 GB). From the
 graph, it is visible that shuffle can account for up to 60\% of total execution
