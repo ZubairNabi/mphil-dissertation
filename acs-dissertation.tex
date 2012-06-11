@@ -1000,12 +1000,71 @@ Figure~\ref{chap:design:fig:missioncontrol} illustrates the architecture of
 Mission Control.
 
 \section{Implementation}
-\textsf{TODO:}
+In this section, we present how Mission Control extends the implementation of
+CIEL to enable multiple transports and transfer scheduling. We first discuss the
+implementation features of CIEL which are important for Mission Control.
 
-Different Kernels, Isis2, Python, C\#, and IronPython.
+\subsection{CIEL Implementation}
+CIEL represents the state of each job in a \emph{dynamic task graph} which
+records the relation between tasks and objects in the form of a bipartite
+graph~\cite{Murray:2011:CUE,Murray:2011:ADE}. The latter is stored in a task
+table while the latter is stored in an object table. The task table stores the
+code and data dependencies of each task keyed by task ID. Similarly, the object
+table stores the input and output objects for each task keyed by object ID. All
+of this information is stored in the form of \emph{references}. CIEL enables a
+number of references which are described in
+Table~\ref{chap:implem:sec:ciel:tab:ref}. The master stores a table of dynamic
+task graphs with one entry for each job in the job pool. In addition, worker
+state is stored in a worker table.
+
+\begin{table}
+  \centering
+  \begin{tabular}{| l || l |}
+    \hline
+	\textbf{Reference} & \textbf{Description} \\ \hline \hline
+    Future & Represents an object that has not been created yet \\ \hline
+    Concrete &  For objects that have concrete values and locations \\ \hline
+    Value & Stores the actual value of small objects \\ \hline
+    Error & Stores the error code of failed tasks \\ \hline
+    Streaming & Enables streaming data between tasks \\ \hline
+    Sweetheart & Represents loop-invariant data \\ \hline
+    Tombstone & Represents objects that are no longer available due to worker
+    failure
+    \\ \hline
+    Fixed & Enables a task to be fixed to a worker\\
+    \hline
+  \end{tabular}
+  \caption{CIEL References}
+  \label{chap:implem:sec:ciel:tab:ref}
+\end{table}
+
+Tasks are scheduled on workers from the worker table once their dependencies
+switch from a state of future reference to concrete reference. The task table is
+updated each time a new task is spawned. Moreover, objects are stored within an
+\emph{object store} at each worker. All of this information is leveraged by
+Mission Control to optimize data transfer (described below). This data-dependent
+abstraction can be used to implement any distributed data flow. For instance, a
+fixed two-stage MapReduce flow can be enabled by adding one output Reference
+from each Map task as a dependency to each Reduce task.
+
+As mentioned earlier, tasks are scheduled once their dependencies become
+concrete. To facilitate this, each \emph{concrete reference} consists of a name,
+location and size. Objects are retrieved by sending an HTTP GET request with the
+name of the object to the location\footnote{In case the reference has multiple
+locations, the request is directed on the basis of network locality or at
+random.} specified in the concrete reference. Under the hood,
+PycURL\footnote{\url{http://pycurl.sourceforge.net/}}, a Python interface to
+libcURL\footnote{\url{http://curl.haxx.se/libcurl/}} is used to fetch the
+object. libcURL is a URL transfer library that supports multiple protocols
+including HTTP and FTP.
+
+\subsection{Mission Control Implementation}
+
+Different Kernels, Isis2, Python, C\#, and
+IronPython\footnote{\url{http://ironpython.net/}}.
 
 Supported protocols: TCP, Weighted TCP (Orchestra-like), MPTCP, DCTCP, TCPcrypt,
-SSH, TCP with Ethernet bonding.
+TCP with Ethernet bonding.
 
 Isis2~\cite{Birman:2012:OCW}\footnote{\url{http://isis2.codeplex.com/}} is a
 toolkit which implements the virtual synchrony model and simplifies the design
@@ -1306,7 +1365,7 @@ equilibrium.
                 \centering
   \begin{tabular}{| l || l | l |}
     \hline
-	Data Size (GB) & DCTCP & TCP \\ \hline
+	\textbf{Data Size (GB)} & \textbf{DCTCP} & \textbf{TCP} \\ \hline
     2 & 0.799 & 0.793 \\ \hline
     4 & 0.902 & 0.904 \\ \hline
     6 & 0.801 & 0.943 \\ \hline
