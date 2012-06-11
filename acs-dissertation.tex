@@ -1007,7 +1007,7 @@ implementation features of CIEL which are important for Mission Control.
 \subsection{CIEL Implementation}
 CIEL represents the state of each job in a \emph{dynamic task graph} which
 records the relation between tasks and objects in the form of a bipartite
-graph~\cite{Murray:2011:CUE,Murray:2011:ADE}. The latter is stored in a task
+graph~\cite{Murray:2011:CUE,Murray:2011:ADE}. The former is stored in a task
 table while the latter is stored in an object table. The task table stores the
 code and data dependencies of each task keyed by task ID. Similarly, the object
 table stores the input and output objects for each task keyed by object ID. All
@@ -1038,8 +1038,8 @@ state is stored in a worker table.
   \label{chap:implem:sec:ciel:tab:ref}
 \end{table}
 
-Tasks are scheduled on workers from the worker table once their dependencies
-switch from a state of future reference to concrete reference. The task table is
+Tasks are scheduled on workers from the worker table once their dependencies, in
+the form of future references, become concrete references. The task table is
 updated each time a new task is spawned. Moreover, objects are stored within an
 \emph{object store} at each worker. All of this information is leveraged by
 Mission Control to optimize data transfer (described below). This data-dependent
