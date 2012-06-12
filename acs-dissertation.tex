@@ -24,8 +24,12 @@ in Data Intensive Computing}
 \def\wordcount{0}
 
 
-\usepackage{epsfig,graphicx,parskip,setspace,tabularx,xspace,epstopdf,url,caption,subcaption,float} 
+\usepackage{epsfig,graphicx,parskip,setspace,tabularx,xspace,epstopdf,url,caption,subcaption,float,listings,color} 
 \graphicspath{{./Figures/}}
+\definecolor{javared}{rgb}{0.6,0,0} % for strings
+\definecolor{javagreen}{rgb}{0.25,0.5,0.35} % comments
+\definecolor{javapurple}{rgb}{0.5,0,0.35} % keywords
+\definecolor{javadocblue}{rgb}{0.25,0.35,0.75} % javadoc
 
 %% START OF DOCUMENT
 \begin{document}
@@ -1045,7 +1049,7 @@ updated each time a new task is spawned. Moreover, objects are stored within an
 Mission Control to optimize data transfer (described below). This data-dependent
 abstraction can be used to implement any distributed data flow. For instance, a
 fixed two-stage MapReduce flow can be enabled by adding one output Reference
-from each Map task as a dependency to each Reduce task.
+from each Map task as a dependency to each Reduce task. 
 
 As mentioned earlier, tasks are scheduled once their dependencies become
 concrete. To facilitate this, each \emph{concrete reference} consists of a name,
@@ -1056,9 +1060,44 @@ random.} specified in the concrete reference. Under the hood,
 PycURL\footnote{\url{http://pycurl.sourceforge.net/}}, a Python interface to
 libcURL\footnote{\url{http://curl.haxx.se/libcurl/}} is used to fetch the
 object. libcURL is a URL transfer library that supports multiple protocols
-including HTTP and FTP. Finally, CIEL also allows partially written objects to
-be pipelined between tasks through \emph{stream references}.
+including HTTP and FTP. Furthermore, CIEL also allows partially written objects
+to be pipelined between tasks through \emph{stream references}. Finally, CIEL
+exposes a language-agnostic interface that can be used to spawn tasks in any
+programming language, including Skywriting, Python, Java, and C. This
+\emph{first-class executor} enables a running task to, (1) Spawn other tasks,
+(2) Delegate its output(s), and (3) Create new objects on the fly.
+In this thesis, we focus on the Java first-class executor, but the design is
+applicable to executors in any language.
 
+\subsubsection{Java First-class Executor}
+Tasks in Java can be written by implementing the \texttt{FirstClassJavaTask}
+interface shown in Listing~\ref{lst:firstclassjavatask}. In addition, the
+platform also provides a \texttt{ConstantNumOutputsTask} interface which extends
+\texttt{FirstClassJavaTask} with a \texttt{getNumOutputs} method to hold the
+number of outputs of a task. Finally, tasks also have access to a \texttt{Ciel}
+object which exposes a number of helper methods, some of which are described in
+Table~\ref{chap:implem:sec:ciel:tab:task}.
+
+\begin{table}
+  \centering
+  \begin{tabularx}{6in}{|X|X|} 
+    \hline
+	\textbf{Method} & \textbf{Description} \\ \hline \hline
+    \texttt{Ciel.args} & Returns user-supplied arguments \\ \hline
+    \texttt{Ciel.spawn} & Spawns a task with the given code dependency \\ \hline
+    \texttt{Ciel.tailSpawn} & Spawns a task with the given code dependency and
+    delegates the expected output(s) of the current task to it
+    \\ \hline
+    \texttt{Ciel.RPC.getStreamForReference} & Opens the object defined
+    in the reference in pipelining mode \\ \hline
+    \texttt{Ciel.RPC.getFilenameForReference} & Fetches the object defined in
+    the reference \\ \hline
+     \texttt{Ciel.RPC.getOutputFilename} & Creates a new reference to hold the
+     output(s) of the task \\ \hline
+ \end{tabularx} 
+  \caption{Important CIEL First-class Java Executor helper methods}
+  \label{chap:implem:sec:ciel:tab:task}
+\end{table}
 
 \subsection{Mission Control Implementation}
 
@@ -1067,6 +1106,40 @@ IronPython\footnote{\url{http://ironpython.net/}}.
 
 Supported protocols: TCP, Weighted TCP (Orchestra-like), MPTCP, DCTCP, TCPcrypt,
 TCP with Ethernet bonding.
+
+\lstset{language=Java,
+basicstyle=\ttfamily,
+keywordstyle=\color{javapurple}\bfseries,
+stringstyle=\color{javared},
+commentstyle=\color{javagreen},
+morecomment=[s][\color{javadocblue}]{/**}{*/},
+numbers=left,
+numberstyle=\tiny\color{black},
+stepnumber=1,
+numbersep=10pt,
+tabsize=4,
+showspaces=false,
+showstringspaces=false}
+\begin{lstlisting}[caption={\texttt{FirstClassJavaTask}
+Interface},label={lst:firstclassjavatask}] 
+public interface FirstClassJavaTask extends Serializable 
+{   
+   /* 
+    * Enables the task to setup any local state
+    */
+	void setup();
+	
+   /*
+    * Holds the actual code for execution
+    */	
+	void invoke() throws Exception;	
+	
+   /*
+    * Returns an array of the dependencies of the task
+    */
+	Reference[] getDependencies();
+}
+\end{lstlisting}
 
 Isis2~\cite{Birman:2012:OCW}\footnote{\url{http://isis2.codeplex.com/}} is a
 toolkit which implements the virtual synchrony model and simplifies the design
