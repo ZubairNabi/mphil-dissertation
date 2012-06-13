@@ -1339,11 +1339,12 @@ by 9\%.
 As mentioned earlier, emerging data center topologies aim to provide multiple
 paths between each source and destination pair. In this experiment, we evaluate
 whether multiple-path aware protocols can achieve higher throughput. We use
-MPTCP~\cite{Raiciu:2012:HHC} as a representative protocol. In this experiment we
-benchmark the performance of our sort application using TCP, TCP with bonding,
-and MPTCP. Out setup consists of 9 containers: 1 master and 8 workers. We vary
-the input dataset size between 1 GB and 4GB\footnote{Due to a bug in the MPTCP
-kernel implementation we are unable to scale out beyond 9 hosts.}.
+MPTCP\footnote{\url{http://mptcp.info.ucl.ac.be/}}~\cite{Raiciu:2012:HHC} as a
+representative protocol. In this experiment we benchmark the performance of our
+sort application using TCP, TCP with bonding, and MPTCP. Out setup consists of 9
+containers: 1 master and 8 workers. We vary the input dataset size between 1 GB
+and 4GB\footnote{Due to a bug in the MPTCP kernel implementation we are unable
+to scale out beyond 9 hosts.}.
 Figure~\ref{chap:eval:sec:ciel:fig:sortshufflemptcp} plots the shuffle time for
 TCP, TCP with bonding, and MPTCP. Surprisingly, MPTCP performs poorly in
 comparison to standard TCP. We attribute this to 3 factors: (1) Additional
@@ -1394,7 +1395,8 @@ We now investigate whether active queue management (AQM)-based congestion
 control can outperform the standard delay-based one. In the former, RTT
 measurements are used as an indication of congestion while in the latter,
 explicit feedback from the switches is employed. We use data center TCP
-(DCTCP)~\cite{Alizadeh:2010:DCT} as a representative protocol for AQM.
+(DCTCP)\footnote{\url{https://github.com/myasuda/DCTCP-Linux}}~\cite{Alizadeh:2010:DCT}
+as a representative protocol for AQM.
 Figure~\ref{chap:eval:sec:ciel:fig:sortshuffledctcp} plots the performance of
 standard delay-based TCP against AQM-based DCTCP on our sort application. DCTCP
 reduces the shuffle time by 20\% on average as it achieves higher throughput.
@@ -1470,8 +1472,9 @@ In cases where the same framework is being used by multiple users without any
 VLAN isolation, users might want to protect their data by enforcing encryption.
 This can be done at the application layer but that would result in a very high
 overhead. We investigate whether transport layer encryption can be applied with
-an acceptable overhead. We use TCPcrypt as a representative protocol and
-benchmark it against standard TCP.
+an acceptable overhead. We use
+TCPcrypt\footnote{\url{https://github.com/sorbo/tcpcrypt}} as a representative
+protocol and benchmark it against standard TCP.
 Figure~\ref{chap:eval:sec:ciel:fig:sortshuffletcpcrypt} shows the shuffle time
 of both protocols. On average, TCPcrypt results in an 85\% increase in data
 transfer. It is worth noting that we used the user-space implementation of
@@ -1541,11 +1544,6 @@ the shuffle time.
     jumbo Ethernet frames}
     \label{chap:eval:sec:ciel:fig:shuffleflowsjumbo}
 \end{figure}
-
-
-
- Hadoop
-for instance implements 5 concurrent connections at each worker. 
 
 \section{Performance of CIEL on different workloads using Mission Control}
 
