@@ -1071,44 +1071,6 @@ programming language, including Skywriting, Python, Java, and C. This
 In this thesis, we focus on the Java first-class executor, but the design is
 applicable to executors in any language.
 
-\subsubsection{Java First-class Executor}
-Tasks in Java can be written by implementing the \texttt{FirstClassJavaTask}
-interface shown in Listing~\ref{lst:firstclassjavatask}. In addition, the
-platform also provides a \texttt{ConstantNumOutputsTask} interface which extends
-\texttt{FirstClassJavaTask} with a \texttt{getNumOutputs} method to hold the
-number of outputs of a task. Finally, tasks also have access to a \texttt{Ciel}
-object which exposes a number of helper methods, some of which are described in
-Table~\ref{chap:implem:sec:ciel:tab:task}.
-
-\begin{table}
-  \centering
-  \begin{tabularx}{6in}{|X|X|} 
-    \hline
-	\textbf{Method} & \textbf{Description} \\ \hline \hline
-    \texttt{Ciel.args} & Returns user-supplied arguments \\ \hline
-    \texttt{Ciel.spawn} & Spawns a task with the given code dependency \\ \hline
-    \texttt{Ciel.tailSpawn} & Spawns a task with the given code dependency and
-    delegates the expected output(s) of the current task to it
-    \\ \hline
-    \texttt{Ciel.RPC.getStreamForReference} & Opens the object defined
-    in the reference in pipelining mode \\ \hline
-    \texttt{Ciel.RPC.getFilenameForReference} & Fetches the object defined in
-    the reference \\ \hline
-     \texttt{Ciel.RPC.getOutputFilename} & Creates a new reference to hold the
-     output(s) of the task \\ \hline
- \end{tabularx} 
-  \caption{Important CIEL First-class Java Executor helper methods}
-  \label{chap:implem:sec:ciel:tab:task}
-\end{table}
-
-\subsection{Mission Control Implementation}
-
-Different Kernels, Isis2, Python, C\#, and
-IronPython\footnote{\url{http://ironpython.net/}}.
-
-Supported protocols: TCP, Weighted TCP (Orchestra-like), MPTCP, DCTCP, TCPcrypt,
-TCP with Ethernet bonding.
-
 \lstset{language=Java,
 basicstyle=\ttfamily,
 keywordstyle=\color{javapurple}\bfseries,
@@ -1142,6 +1104,64 @@ public interface FirstClassJavaTask extends Serializable
 	Reference[] getDependencies();
 }
 \end{lstlisting}
+
+\subsubsection{Java First-class Executor}
+Tasks in Java can be written by implementing the \texttt{FirstClassJavaTask}
+interface shown in Listing~\ref{lst:firstclassjavatask}. In addition, the
+platform also provides a \texttt{ConstantNumOutputsTask} interface which extends
+\texttt{FirstClassJavaTask} with a \texttt{getNumOutputs} method to hold the
+number of outputs of a task. Finally, tasks also have access to a \texttt{Ciel}
+object which exposes a number of helper methods, some of which are described in
+Table~\ref{chap:implem:sec:ciel:tab:task}.
+
+\begin{table}
+  \centering
+  \begin{tabularx}{6in}{|X|X|} 
+    \hline
+	\textbf{Method} & \textbf{Description} \\ \hline \hline
+    \texttt{Ciel.args} & Returns user-supplied arguments \\ \hline
+    \texttt{Ciel.spawn} & Spawns a task with the given code dependency \\ \hline
+    \texttt{Ciel.tailSpawn} & Spawns a task with the given code dependency and
+    delegates the expected output(s) of the current task to it
+    \\ \hline
+    \texttt{Ciel.RPC.getStreamForReference} & Opens the object defined
+    in the reference in pipelining mode \\ \hline
+    \texttt{Ciel.RPC.getFilenameForReference} & Fetches the object defined in
+    the reference \\ \hline
+     \texttt{Ciel.RPC.getOutputFilename} & Creates a new reference to hold the
+     output(s) of the task \\ \hline
+ \end{tabularx} 
+  \caption{Important CIEL First-class Java Executor helper methods}
+  \label{chap:implem:sec:ciel:tab:task}
+\end{table}
+
+\subsection{Mission Control Implementation}
+\begin{table}
+  \centering
+  \begin{tabularx}{5in}{|X|X|} 
+    \hline
+	\textbf{Protocol} & \textbf{Description} \\ \hline \hline
+    TCP & The default transport \\ \hline
+    MPTCP & Selected when the host has more than one interface. In case MPTCP is
+    selected, the number of concurrent data fetch connections per host are
+    turned into concurrent sub-flows under the same MPTCP connection.
+    \\ \hline 
+    DCTCP & Selected when the switches in the network support ECN.
+    \\ \hline
+    TCPcrypt & Not selected by the framework. It needs to be explicitly enabled
+    during job submission time by the user.
+    \\
+    \hline
+ \end{tabularx} 
+  \caption{List of transport protocols supported by Mission Control}
+  \label{chap:implem:sec:ciel:tab:protocols}
+\end{table}
+
+Different Kernels, Isis2, Python, C\#, and
+IronPython\footnote{\url{http://ironpython.net/}}.
+
+The list of currently supported protocols and their selection criteria is given
+in Table~\ref{chap:implem:sec:ciel:tab:protocols}.
 
 Isis2~\cite{Birman:2012:OCW}\footnote{\url{http://isis2.codeplex.com/}} is a
 toolkit which implements the virtual synchrony model and simplifies the design
@@ -1593,6 +1613,10 @@ Future work:
 	latency. Protocols such as HULL~\cite{Alizadeh:2012:LIM} make this trade-off
 	possible. Mission Control can be extended to use global knowledge to optimize
 	this trade-off.
+	\item Mission Control currently supports 4 different transport protocols but
+	the framework is flexible enough to be extended to make use of more protocols
+	such as Deadline-Driven Delivery (D$^3$)~\cite{Wilson:2011:BNL}, Structured Stream
+	Transport (SST)~\cite{Ford:2007:SSN}, and ICTCP~\cite{Wu:2010:IIC}.
 \end{itemize}
 
 \appendix
