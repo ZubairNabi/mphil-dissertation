@@ -1176,7 +1176,7 @@ addition, the former was provisioned with 100 GB of HDD space in the form of a
 logical volume while the latter were provisioned with 20 GB of the same each.
 The SSD is shared by all. Finally,
 OpenVSwitch~\cite{Pfaff:2009:ENI}\footnote{\url{http://openvswitch.org/download/}}
-is used as the L2 fabric.
+is used as the L2 fabric with 1 Gbps link speed.
 
 For all our experiments, we use a custom MapReduce Java library written for
 CIEL\footnote{\url{https://github.com/ZubairNabi/ciel-java/tree/master/examples/src/main/java/com/asgow/ciel/examples/mapreduce}}.
@@ -1476,6 +1476,76 @@ Figure~\ref{chap:eval:sec:ciel:fig:sortshuffletcpcrypt} shows the shuffle time
 of both protocols. On average, TCPcrypt results in an 85\% increase in data
 transfer. It is worth noting that we used the user-space implementation of
 TCPcrypt. A kernel-space implementation would potentially decrease the overhead.
+
+\begin{table}
+  \centering
+  \begin{tabular}{| l || l | l | l |}
+    \hline
+	\textbf{Receivers} & \textbf{Input size (GB)} & \textbf{Maps} &
+	\textbf{Reduces}
+	\\
+	\hline
+	10 & 2.5 & 40 & 10 \\ \hline
+    20 & 5 & 80 & 20 \\ \hline
+    30 & 7.5 & 120 & 30 \\ \hline
+    40 & 10 & 160 & 40\\ \hline
+    \hline
+  \end{tabular}
+  \caption{Parameters for concurrent flows experiment}
+  \label{chap:eval:sec:ciel:tab:flows}
+\end{table}
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.8\textwidth]{shuffle_flows.eps}
+    \caption{Shuffle time with increasing number of concurrent flows}
+    \label{chap:eval:sec:ciel:fig:shuffleflows}
+\end{figure}
+
+\subsection{Number of concurrent flows}
+In this experiment, we check the effect of varying the number of concurrent
+connections at each worker to fetch its input during the shuffle phase. In
+addition, we also study whether the number of receivers has any bearing on the
+shuffle time. We vary the number of map and reduce tasks and the input data size
+for our sort application (given in Table~\ref{chap:eval:sec:ciel:tab:flows}) to
+force each reduce task to fetch approximately 256 MB of data.
+Figure~\ref{chap:eval:sec:ciel:fig:shuffleflows} shows shuffle time for
+increasing number of receivers as a function of the number of flows.
+Surprisingly, the number of concurrent flows has no effect on the shuffle time.
+To find out whether this is due to the nature of the application or our
+experimental setup, we use
+\texttt{iperf}\footnote{\url{http://sourceforge.net/projects/iperf/}} to measure
+the throughput of concurrent senders . For even a small number of senders as 16,
+the average throughput is 140.937 Mbps, which is far below the theoretical value
+of 1 Gbps. Increasing the maximum transmission unit (MTU)\footnote{MTU is
+maximum unit of data in bytes that is passed by any layer of the network stack.}
+of Ethernet to 9000 byte jumbo frames~\cite{Chase:2000:ESO} substantially
+increases the per sender/receiver pair throughput to 881.5 Mbps. Having achieved
+full-bisection bandwidth between sender/receiver pairs, we repeat the original
+experiment on our improved setup and plot the result in
+Figure~\ref{chap:eval:sec:ciel:fig:shuffleflowsjumbo}. The results point to 3
+main takeaways, (1) The effect of concurrent flows comes into play when the
+receivers have to fetch more than one file from each sender, (2) Even having two
+concurrent connections substantially improves performance, (3) Beyond a certain
+point we encounter diminishing returns. In fact, due to the three point, systems
+such as Hadoop limit the number of concurrent flows per receiver to
+5\footnote{This limit is also set to keep the number of threads in check and
+also to mitigate incast~\cite{Chowdhury:2011:MDT}.}. This analysis proves that
+using the number of flows to implement weighted transport scheduling can effect
+the shuffle time.
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.8\textwidth]{shuffle_flows_jumbo.eps}
+    \caption{Shuffle time with increasing number of concurrent flows using
+    jumbo Ethernet frames}
+    \label{chap:eval:sec:ciel:fig:shuffleflowsjumbo}
+\end{figure}
+
+
+
+ Hadoop
+for instance implements 5 concurrent connections at each worker. 
 
 \section{Performance of CIEL on different workloads using Mission Control}
 
