@@ -145,6 +145,7 @@ specifying a set of files and network destinations. In addition, frameworks can
 also expose a set of constraints, such as the use of encryption. Mission Control
 uses global information to choose an optimum policy for each data transfer. We
 have implemented Mission Control for the CIEL~\cite{Murray:2011:CUE} framework.
+Finally, we evaluate the performance of CIEL under various transport semantics.
 
 \section{The Case Against TCP in the Data Center}
 During the last 3 decades the Internet protocol stack has experienced
@@ -1506,11 +1507,23 @@ Future work:
    \item It would interesting to see how Mission Control can be used to leverage
    the transparency of the software stack in Akaros~\cite{Rhoden:2011:IPE} to
    improve I/O performance.
-   \item 80\% of the traffic stays within a rack~\cite{Benson:2010:NTC}, can we
-optimize it?
-	\item Evaluation in a shared environment.
-	\item Multiple frameworks?
-	\item Bandwidth vs. latency~\cite{Alizadeh:2012:LIM}.
+   \item 80\% of the traffic in a cluster stays within a
+   rack~\cite{Benson:2010:NTC}. This information can be used by Mission Control
+   to assign more flows to in-rack transfers.
+   \item In this thesis we only considered an environment under the operational
+	control of a single domain. It is not clear how different transport protocols
+	would interact with each other within the same data center. For instance,
+	DCTCP flows might not ensure fairness to TCP flows~\cite{Alizadeh:2010:DCT}.
+	\item Our focus in this discussion was on batch-processing systems which
+	require high throughput. In addition to the systems, data centers also run
+	stream processing systems, such as S4~\cite{Neumeyer:2010:SDS} and
+	Percolator~\cite{Peng:2010:LIP}, which require low latency. The choice of
+	underlying transport semantics is completely different and Mission Control
+	would need to be made aware of these requirements.
+	\item The last point can be generalized to a trade-off between bandwidth and
+	latency. Protocols such as HULL~\cite{Alizadeh:2012:LIM} make this trade-off
+	possible. Mission Control can be extended to use global knowledge to optimize
+	this trade-off.
 \end{itemize}
 
 \appendix
