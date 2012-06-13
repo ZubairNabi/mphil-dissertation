@@ -975,14 +975,15 @@ allocation is used for broadcast transfers. Concretely,
   share_{broadcast} = N^2
 \end{equation}
 
-Where $N$ is the number of machines that the job uses.
-
-More importantly, Mission Controller maintains cluster-wide state of resources
-and selects the transport layer protocol for a particular transfer.
-
-\textsf{TODO: When and how to select a transport?}
-
-\textsf{TODO: How to get user constraints?}
+Where $N$ is the number of machines that the job uses. To distinguish between
+shuffle and broadcast transfers, Mission Controller walks the task graph to
+observe the relationships between tasks and their inputs and outputs (described
+in the implementation section). In addition, transport protocols are selected on
+the basis of job characteristics and the environment. For example, multi-path
+TCP is selected if the host has more than one interface. Moreover, users can
+explicitly specify a transport protocol at job submission time. In summary,
+Mission Controller maintains cluster-wide state of resources and selects the
+transport layer protocol for a particular transfer.
 
 \subsection{Flight Controller}
 Each transfer is associated with a Flight Controller that handles transport
