@@ -1206,12 +1206,26 @@ assigned all 10 flows.
   \label{chap:implem:sec:ciel:tab:policiesassign}
 \end{table}
 
+Be default, Mission Controller uses the
+performance-centric~\cite{Kumar:2012:ACF} policy in which weights are assigned
+on the basis of application semantics. To this end, Mission Controller performs
+a breadth-first search of the dynamic task graph for each job. If the tasks in a
+stage have one reference from each task in the previous stage as a dependency,
+the stage is marked as a shuffle. In contrast, if all of the output references
+of the previous stage are dependencies of the subsequent stage, then the stage
+is marked as a broadcast. This information is then used to assign twice the
+weight of a shuffle transfer to a broadcast transfer. In addition, the current
+implementation supports four transport protocols. These protocols and their
+selection criteria is given in Table~\ref{chap:implem:sec:ciel:tab:protocols}.
+It is important to highlight that any transport protocol can easily be added to
+Mission Controller by extending the Flight Controller class.
+
 \begin{table}
   \centering
   \begin{tabularx}{5in}{|X|X|} 
     \hline
 	\textbf{Protocol} & \textbf{Description} \\ \hline \hline
-    TCP & The default transport \\ \hline
+    TCP & The default transport. \\ \hline
     MPTCP & Selected when the host has more than one interface. In case MPTCP is
     selected, the number of concurrent data fetch connections per host are
     turned into concurrent sub-flows under the same MPTCP connection.
@@ -1229,9 +1243,6 @@ assigned all 10 flows.
 
 Different Kernels, Isis2, Python, C\#, and
 IronPython\footnote{\url{http://ironpython.net/}}.
-
-The list of currently supported protocols and their selection criteria is given
-in Table~\ref{chap:implem:sec:ciel:tab:protocols}.
 
 Isis2~\cite{Birman:2012:OCW}\footnote{\url{http://isis2.codeplex.com/}} is a
 toolkit which implements the virtual synchrony model and simplifies the design
@@ -1571,7 +1582,7 @@ TCPcrypt\footnote{\url{https://github.com/sorbo/tcpcrypt}} as a representative
 protocol and benchmark it against standard TCP.
 Figure~\ref{chap:eval:sec:ciel:fig:sortshuffletcpcrypt} shows the shuffle time
 of both protocols. On average, TCPcrypt results in an 85\% increase in data
-transfer. It is worth noting that we used the user-space implementation of
+transfer time. It is worth noting that we used the user-space implementation of
 TCPcrypt. A kernel-space implementation would potentially decrease the overhead.
 
 \begin{table}
