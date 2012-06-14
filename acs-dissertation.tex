@@ -1156,6 +1156,17 @@ Table~\ref{chap:implem:sec:ciel:tab:task}.
   \caption{List of transport protocols supported by Mission Control}
   \label{chap:implem:sec:ciel:tab:protocols}
 \end{table}
+Mission Control extends both the Python implementation of CIEL and its
+first-class Java executor. The
+former\footnote{\url{https://github.com/ZubairNabi/ciel}} is modified to
+implement Mission Controller, Flight Controller, and Throttle Controller while
+the latter\footnote{\url{https://github.com/ZubairNabi/ciel-java}} is extended
+to enable concurrent data fetch threads. In addition, a number of Bash
+scripts\footnote{\url{https://github.com/ZubairNabi/ciel/tree/master/scripts}}
+have also been written to manage CIEL and the working environment. We first
+describe the changes to the master followed by changes to the worker.
+
+\subsubsection{Master}\label{chap:implem:sec:ciel:subsec:master}
 
 Different Kernels, Isis2, Python, C\#, and
 IronPython\footnote{\url{http://ironpython.net/}}.
@@ -1174,6 +1185,9 @@ multicast messages have reached their destinations. Isis2 also provides a number
 of send primitives including a FIFO-ordered send as well as a \emph{SafeSend},
 which implements a virtually synchronous version of
 Paxos~\cite{Lamport:1998:PP}.
+
+\subsubsection{Worker}\label{chap:implem:sec:ciel:subsec:workers}
+
 
 \chapter{Evaluation}\label{chapter:evaluation}
 This section presents a thorough evaluation of Mission Control. We first
