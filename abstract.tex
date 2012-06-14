@@ -3,8 +3,40 @@
 \vspace{24pt} 
 
 
-This is the abstract. Write a summary of the whole thing. Make 
-sure it fits in one page. 
+Data intensive computing frameworks have become ubiquitous due to their ability
+to crunch petascale data while scaling to thousands of machines. These
+frameworks require high throughput to transfer huge amounts of data during
+different stages. In fact, transfer of this data dictates job completion time by
+more than 50\%. Unfortunately, the troika of data center topologies, protocols,
+and control mechanisms has been unable to satisfy these high throughput needs.
+In addition, lack of proper network behaviour understanding has forced all of
+these frameworks to use standard TCP for data transfer which is sub-optimal in
+the data center due to the radically different environment. Recently proposed
+extensions of TCP address some of these shortcomings but are unable to provide a
+general solution.
+
+To remedy this, we present Mission Control, a system that uses application
+requirements in conjunction with system-wide state to choose the best possible
+mechanism and protocol for data transfer. Specifically, to optimize data
+transfer it, (1) Uses different policies to distribute available network
+resources among the running tasks and (2) Chooses the transport protocol based
+on user-constraints or network characteristics. We have implemented Mission
+Control for CIEL and the framework currently supports a wide range of resource
+allocation policies such as fair, FIFO, priority, and performance-centric.
+Additionally, the list of supported transport protocols includes data center
+TCP, multi-path TCP, and TCPcrypt. Moreover, the framework can distinguish
+between shuffle and broadcast transfer to appropriately allocate resources.
+
+Our evaluation shows that data transfer indeed accounts for a large chunk of the
+job completion time and can potentially become a performance bottle-neck. In
+addition, multi-path TCP enables the framework to leverage multiple paths in
+the network. Moreover, data center TCP improves job completion time by 20\% on
+average but is unable to match TCP's per flow fairness. Furthermore, TCPcrypt
+can transparently encrypt data with an acceptable overhead. Most importantly,
+the evaluation corroborates our thesis that there is no single solution which is
+applicable across the board and to counter this, it imperative to have diversity
+at the transport layer.
+
 
 
 \newpage
