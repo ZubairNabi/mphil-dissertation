@@ -1073,24 +1073,6 @@ abstraction can be used to implement any distributed data flow. For instance, a
 fixed two-stage MapReduce flow can be enabled by adding one output Reference
 from each Map task as a dependency to each Reduce task. 
 
-As mentioned earlier, tasks are scheduled once their dependencies become
-concrete. To facilitate this, each \emph{concrete reference} consists of a name,
-location and size. Objects are retrieved by sending an HTTP GET request with the
-name of the object to the location\footnote{In case the reference has multiple
-locations, the request is directed on the basis of network locality or at
-random.} specified in the concrete reference. Under the hood,
-PycURL\footnote{\url{http://pycurl.sourceforge.net/}}, a Python interface to
-libcURL\footnote{\url{http://curl.haxx.se/libcurl/}} is used to fetch the
-object. libcURL is a URL transfer library that supports multiple protocols
-including HTTP and FTP. Furthermore, CIEL also allows partially written objects
-to be pipelined between tasks through \emph{stream references}. Finally, CIEL
-exposes a language-agnostic interface that can be used to spawn tasks in any
-programming language, including Skywriting, Python, Java, and C. This
-\emph{first-class executor} enables a running task to, (1) Spawn other tasks,
-(2) Delegate its output(s), and (3) Create new objects on the fly.
-In this thesis, we focus on the Java first-class executor, but the design is
-applicable to executors in any language.
-
 \lstset{language=Java,
 basicstyle=\ttfamily,
 keywordstyle=\color{javapurple}\bfseries,
@@ -1100,6 +1082,7 @@ morecomment=[s][\color{javadocblue}]{/**}{*/},
 numbers=left,
 numberstyle=\tiny\color{black},
 stepnumber=1,
+captionpos=b,
 numbersep=10pt,
 tabsize=4,
 showspaces=false,
@@ -1124,6 +1107,24 @@ public interface FirstClassJavaTask extends Serializable
 	Reference[] getDependencies();
 }
 \end{lstlisting}
+
+As mentioned earlier, tasks are scheduled once their dependencies become
+concrete. To facilitate this, each \emph{concrete reference} consists of a name,
+location and size. Objects are retrieved by sending an HTTP GET request with the
+name of the object to the location\footnote{In case the reference has multiple
+locations, the request is directed on the basis of network locality or at
+random.} specified in the concrete reference. Under the hood,
+PycURL\footnote{\url{http://pycurl.sourceforge.net/}}, a Python interface to
+libcURL\footnote{\url{http://curl.haxx.se/libcurl/}} is used to fetch the
+object. libcURL is a URL transfer library that supports multiple protocols
+including HTTP and FTP. Furthermore, CIEL also allows partially written objects
+to be pipelined between tasks through \emph{stream references}. Finally, CIEL
+exposes a language-agnostic interface that can be used to spawn tasks in any
+programming language, including Skywriting, Python, Java, and C. This
+\emph{first-class executor} enables a running task to, (1) Spawn other tasks,
+(2) Delegate its output(s), and (3) Create new objects on the fly.
+In this thesis, we focus on the Java first-class executor, but the design is
+applicable to executors in any language.
 
 \subsubsection{Java First-class Executor}
 Tasks in Java can be written by implementing the \texttt{FirstClassJavaTask}
@@ -1417,6 +1418,13 @@ generated 64 MB cluster files with 80,000 dense vectors and \emph{k}, cluster
 center, value of 100. Each vector contains 100 double-precision
 values~\cite{Murray:2011:CUE}.
 
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.8\textwidth]{kmeans_sort.eps}
+    \caption{Sort and \emph{k}-means Job Completion Time}
+    \label{chap:eval:sec:ciel:fig:kmeans}
+\end{figure}
+
 Figure~\ref{chap:eval:sec:ciel:fig:kmeans} plots the job completion time of
 \emph{k}-means as a function of the input data size. In contrast to sort, the
 execution time of \emph{k}-means shoots up with an increase in input. This is
@@ -1424,13 +1432,6 @@ due to the CPU intensive nature of the application as well as the dynamic task
 generation. The CPU and network usage of the application is shown in
 Figure~\ref{chap:eval:sec:ciel:fig:kmeansres}. Again in contrast to sort, we see
 network and CPU activity throughout the course of the execution.
-
-\begin{figure}[h!]
-  \centering
-    \includegraphics[width=0.8\textwidth]{kmeans_sort.eps}
-    \caption{Sort and \emph{k}-means Job Completion Time}
-    \label{chap:eval:sec:ciel:fig:kmeans}
-\end{figure}
 
 \begin{figure}[h!]
         \begin{subfigure}[b]{0.33\textwidth}
