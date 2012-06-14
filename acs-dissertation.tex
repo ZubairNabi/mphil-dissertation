@@ -1261,9 +1261,8 @@ Mission Controller by extending the Flight Controller class.
   \label{chap:implem:sec:ciel:tab:protocols}
 \end{table}
 
-Different Kernels, Isis2, Python, C\#, and
-IronPython\footnote{\url{http://ironpython.net/}}.
-
+To implement the communication model of Mission Control, we use the Isis2
+virtual synchrony library.
 Isis2~\cite{Birman:2012:OCW}\footnote{\url{http://isis2.codeplex.com/}} is a
 toolkit which implements the virtual synchrony model and simplifies the design
 of distributed applications. It provides a number of reliable multicast
@@ -1274,7 +1273,16 @@ through a barrier primitive called \emph{Flush}, that delays till all prior
 multicast messages have reached their destinations. Isis2 also provides a number
 of send primitives including a FIFO-ordered send as well as a \emph{SafeSend},
 which implements a virtually synchronous version of
-Paxos~\cite{Lamport:1998:PP}.
+Paxos~\cite{Lamport:1998:PP}. Isis2 targets C\# development but can be called
+from with IronPython\footnote{\url{http://ironpython.net/}}. Therefore, to make
+use of Isis2 we first port CIEL to IronPython. In our implementation, CIEL
+workers are organized into a virtual group. The Mission Controller multicasts
+weight allocations and transport semantics to the virtual group using the Isis2
+send primitive. This enables all workers to have the same consistent view of the
+transport semantics. Isis2 uses a ``dynamically reconfigurable services'' model
+as a consensus mechanism known as the ORACLE. We currently run the ORACLE
+service at the master node but for large-scale deployments it would be more
+feasible to have more than one ORACLE.
 
 \subsubsection{Worker}\label{chap:implem:sec:ciel:subsec:workers}
 \sloppy At the worker, the implementation consists of a Throttle Controller
@@ -1741,13 +1749,6 @@ overrun the shared buffer in the switch.
         \caption{Time series of receive queue length for TCP and DCTCP}
         \label{chap:eval:sec:ciel:fig:queue}
 \end{figure}
-
-\section{Performance of Virtual Synchrony primitives}
-- Multicast time
-
-- Overhead of Isis2
-
-- IronPython vs. cPython
 
 \section{Summary}
 Overall, the evaluation shows that concurrent flow assignment is a practical
