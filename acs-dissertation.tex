@@ -287,7 +287,28 @@ of the total power~\cite{Greenberg:2008:CCR}. Likewise, application traffic can
 transparently and efficiently~\cite{bittau:the} be encrypted to ensure security
 in a multi-tenant environment.
 
-Our evaluation shows that\ldots\ldots
+Thus, our main contributions are the following: 
+\begin{enumerate}
+  \item Highlighting the shortcomings of TCP in the data center and taking a
+  position that the solution is to have diversity at the transport layer.
+  \item The design and implementation of Mission Control, an abstraction layer
+  that chooses data transfer semantics for a particular transfer.
+  \item An evaluation of different transport protocols to show their pros and
+  cons. The evaluation suggests that there is no one-size-fits-all protocol as
+  each protocol explores a different point in the design and optimization space.
+\end{enumerate}
+
+Our evaluation shows that data transfer indeed accounts for a large chunk of the
+job completion time and can potentially become a performance bottle-neck. The
+evaluation also shows that increasing the number of concurrent data fetch flows
+at hosts can improve the transfer throughput. In addition, multi-path TCP
+enables the framework to leverage multiple paths in the network. Moreover, data
+center TCP improves job completion time by 20\% on average by keeping the TCP
+receive queue length in check but is unable to match TCP's per flow fairness.
+Furthermore, TCPcrypt can transparently encrypt data with an acceptable
+overhead. Most importantly, the evaluation corroborates our thesis that there is
+no single solution which is applicable across the board and to counter this, it
+imperative to have diversity at the transport layer.
 
 The rest of this document is structured as follows. \S\ref{chapter:background}
 gives an overview of the cloud computing paradigm, data intensive computing
@@ -297,7 +318,6 @@ design and implementation of Mission Control. An evaluation of the network
 patterns of existing systems and of Mission Control is given in
 \S\ref{chapter:evaluation}. Finally, \S\ref{chapter:conclusion} concludes and
 points to future work.
-
 
 \chapter{Background}\label{chapter:background}
 This section first gives an overview of cloud computing
@@ -1728,6 +1748,15 @@ overrun the shared buffer in the switch.
 - Overhead of Isis2
 
 - IronPython vs. cPython
+
+\section{Summary}
+Overall, the evaluation shows that concurrent flow assignment is a practical
+method of allocating network resources. In addition, transport protocol
+performance and usefulness can vary depending on application semantics and user
+requirements. Finally, it is possible for a data intensive computing framework
+to delegate its data transfer to an abstraction layer without requiring any
+architectural changes to the framework itself or the applications which execute
+atop it.
 
 \chapter{Summary and Conclusions}\label{chapter:conclusion}
 It is a well-known fact that TCP is sub-optimal inside the data center as it was
