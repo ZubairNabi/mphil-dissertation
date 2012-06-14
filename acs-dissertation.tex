@@ -1730,8 +1730,38 @@ overrun the shared buffer in the switch.
 - IronPython vs. cPython
 
 \chapter{Summary and Conclusions}\label{chapter:conclusion}
+It is a well-known fact that TCP is sub-optimal inside the data center as it was
+originally designed for a wide-area network with radically different
+requirements and settings. A number of different solutions have been recently
+proposed with the aim to address the shortcomings of TCP in the data center.
+These vary from novel topologies to protocols which take advantage of multiple
+paths in the network. Unfortunately, there is no one-size-fits-all solution. To
+remedy this, in this thesis we presented, Mission Control, an abstraction layer
+that maintains global state to choose the semantics of data transfers in data
+intensive computing frameworks. To this end, it uses application semantics, user
+constraints, runtime parameters, and network characteristics to select an
+appropriate transport protocol and data transfer schedule. It is capable of
+using different policies to allocate network resources to different transfers.
+In addition, it supports a range of transport protocols to enable diversity. The
+evaluation presented in this thesis corroborates our position that there is no
+transport regime which is optimal across the board. In summary, the main
+contributions of this thesis are the following:
 
-Future work:
+\begin{enumerate}
+  \item Analysis of common communication patterns in the data center and
+  relevant literature to prove that TCP is sub-optimal in the data center
+  \item Design and implementation of Mission Control, which enables
+  data intensive computing frameworks to delegate data transfer mechanism and
+  policy
+  \item Evaluation of CIEL under different transport semantics and insight into
+  data transfer operation
+\end{enumerate}
+
+The biggest contribution of Mission Control is the framework itself which allows
+any transport protocol, current or future, to be used by batch-processing
+systems without requiring any changes to the systems or the applications.
+Thus, Mission Control is a means to an end: Decoupling data transfer mechanism
+from policy in the data center. We conclude by listing possible future work:
 
 \begin{itemize}
   \item Recent work~\cite{Smith:2012:TCF} has shown that I/O throughput
