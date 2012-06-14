@@ -1136,6 +1136,76 @@ Table~\ref{chap:implem:sec:ciel:tab:task}.
 \end{table}
 
 \subsection{Mission Control Implementation}
+
+\begin{table}
+  \centering
+  \begin{tabularx}{5in}{|X|X|} 
+    \hline
+	\textbf{Policy} & \textbf{Description} \\ \hline \hline
+    FIFO & Jobs are assigned weights on the basis of their arrival time. \\
+    \hline 
+    Priority & Job priorities are specified by the user. A job with a priority
+    of 2 is assigned a weight which is double the weight assigned to a
+    priority 1 job.\\ \hline 
+    Fair & Jobs are assigned equal weights.\\ \hline 
+    Performance-centric & Weights are assigned to maximize performance
+    parallelism. A broadcast transfer is assigned twice the weight of a shuffle
+    transfer.\\
+    \hline
+ \end{tabularx} 
+  \caption{List of weight assignment policies supported by Mission Control}
+  \label{chap:implem:sec:ciel:tab:policies}
+\end{table}
+
+Mission Control extends both the Python implementation of CIEL and its
+first-class Java executor. The
+former\footnote{\url{https://github.com/ZubairNabi/ciel}} is modified to
+implement Mission Controller, Flight Controller, and Throttle Controller while
+the latter\footnote{\url{https://github.com/ZubairNabi/ciel-java}} is extended
+to enable concurrent data fetch threads. In addition, a number of Bash
+scripts\footnote{\url{https://github.com/ZubairNabi/ciel/tree/master/scripts}}
+have also been written to manage CIEL and the working environment. We first
+describe the changes to the master followed by changes to the worker.
+
+\subsubsection{Master}\label{chap:implem:sec:ciel:subsec:master}
+At the master, the Mission Control implementation consists of two classes to
+represent Mission Controller and Flight Controller, respectively. We modified
+the CIEL representation of a job to associate each job with a weight and a
+Flight Controller. The Mission Controller thread is spawned during the
+initialization of the master. It maintains an updated list of currently running
+jobs along with their tasks and dependencies. In addition, it is also associated
+with a policy which dictates per-job weight assignment. The list of currently
+supported policies is given in Table~\ref{chap:implem:sec:ciel:tab:policies}.
+The weights assigned by these policies determine the number of concurrent flows
+that each job can initiate during a data fetch. These weights are updated every
+second depending on the selected policy.
+Table~\ref{chap:implem:sec:ciel:tab:policiesassign} shows how weights are
+assigned under different policies for 2 jobs: Job 1 and Job 2. The maximum
+number of concurrent flows per host is 10 and Job 1 arrives first and is
+assigned all 10 flows.
+
+\begin{table}
+  \centering
+  \begin{tabularx}{5in}{|X|X|} 
+    \hline
+	\textbf{Policy} & \textbf{Weights} \\ \hline \hline
+    FIFO & As soon as Job 2
+    arrives, it is assigned a weight of 3 and the weight of Job 1 is decreased
+    to 7. \\ \hline 
+    Priority & Job 2 arrives and has a higher priority than Job 1. Job 2 is
+    assigned a weight of 7 and the weight of Job 1 is decreased to 3. \\
+    \hline 
+    Fair & Job 2 arrives and is assigned a weight of 5 and the weight of Job
+    1 is decreased to 5.\\ \hline 
+    Performance-centric & Job 1 is has a shuffle transfer while Job 2 has a
+    broadcast transfer. Job 2 arrives and is assigned a weight of 7 and the
+    weight of Job 1 is decreased to 3.\\
+    \hline
+ \end{tabularx} 
+  \caption{Example of weight assignment under different policies for 2 jobs}
+  \label{chap:implem:sec:ciel:tab:policiesassign}
+\end{table}
+
 \begin{table}
   \centering
   \begin{tabularx}{5in}{|X|X|} 
@@ -1156,17 +1226,6 @@ Table~\ref{chap:implem:sec:ciel:tab:task}.
   \caption{List of transport protocols supported by Mission Control}
   \label{chap:implem:sec:ciel:tab:protocols}
 \end{table}
-Mission Control extends both the Python implementation of CIEL and its
-first-class Java executor. The
-former\footnote{\url{https://github.com/ZubairNabi/ciel}} is modified to
-implement Mission Controller, Flight Controller, and Throttle Controller while
-the latter\footnote{\url{https://github.com/ZubairNabi/ciel-java}} is extended
-to enable concurrent data fetch threads. In addition, a number of Bash
-scripts\footnote{\url{https://github.com/ZubairNabi/ciel/tree/master/scripts}}
-have also been written to manage CIEL and the working environment. We first
-describe the changes to the master followed by changes to the worker.
-
-\subsubsection{Master}\label{chap:implem:sec:ciel:subsec:master}
 
 Different Kernels, Isis2, Python, C\#, and
 IronPython\footnote{\url{http://ironpython.net/}}.
