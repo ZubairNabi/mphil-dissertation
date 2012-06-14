@@ -1599,6 +1599,14 @@ TCPcrypt. A kernel-space implementation would potentially decrease the overhead.
     \label{chap:eval:sec:ciel:fig:shuffleflows}
 \end{figure}
 
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.8\textwidth]{shuffle_flows_jumbo.eps}
+    \caption{Shuffle time with increasing number of concurrent flows using
+    jumbo Ethernet frames}
+    \label{chap:eval:sec:ciel:fig:shuffleflowsjumbo}
+\end{figure}
+
 \subsection{Number of concurrent flows}
 In this experiment, we check the effect of varying the number of concurrent
 connections at each worker to fetch its input during the shuffle phase. In
@@ -1630,24 +1638,63 @@ such as Hadoop limit the number of concurrent flows per receiver to
 also to mitigate incast~\cite{Chowdhury:2011:MDT}.}. This analysis proves that
 using the number of flows to implement weighted transport scheduling can effect
 the shuffle time.
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.3\textwidth]{2_rack_topology.eps}
+    \caption{2 rack topology}
+    \label{chap:eval:sec:ciel:fig:topology}
+\end{figure}
+
+\section{Performance of CIEL under Mission Control}
+In this section, we evaluate the performance of CIEL under Mission Control for a
+2 rack topology and 3 switches. Rack 1 has 21 hosts (containers) while Rack 2
+has 20 hosts (containers). Hosts within each rack are connected via a 1 Gbps
+switch each while the racks are connected via another 1 Gbps. The topology is
+shown in Figure~\ref{chap:eval:sec:ciel:fig:topology}. The master is run on a
+host in Rack 1 while the rest of the hosts in the two racks run workers. We
+evaluate the performance of our sort application for different input sizes. We
+first do the evaluation using the default TCP Flight Controller. We then repeat
+the experiment by turning on ECN in all switches. This prompts Mission
+Controller to switch to the DCTCP Flight Controller.
+Figure~\ref{chap:eval:sec:ciel:fig:shuffle2racks} plots the shuffle time for
+this experiment. On average, DCTCP results in a 9\% improvement in shuffle time.
+DCTCP aims to keep switch buffer occupancies low by reacting to the extent of
+congestion. By default, for a 1 Gbps network the queue length is limited to 20
+packets or 30 KB. To corroborate this, we log the TCP receive queue length of
+every worker every 125 ms for both TCP and DCTCP for an input data set of size
+10 GB. Figure~\ref{chap:eval:sec:ciel:fig:queue} plots the time series of queue
+length for a single worker. We see that DCTCP is able to keep the queue length
+within 30 KB while the TCP receive queue is longer and has more variation. As a
+result, DCTCP mitigates buffer pressure and does not allow a single flow to
+overrun the shared buffer in the switch.
+
 
 \begin{figure}[h!]
   \centering
-    \includegraphics[width=0.8\textwidth]{shuffle_flows_jumbo.eps}
-    \caption{Shuffle time with increasing number of concurrent flows using
-    jumbo Ethernet frames}
-    \label{chap:eval:sec:ciel:fig:shuffleflowsjumbo}
+    \includegraphics[width=0.8\textwidth]{shuffle_sort_dctcp_2racks.eps}
+    \caption{Shuffle time for TCP and DCTCP on a two rack topology}
+    \label{chap:eval:sec:ciel:fig:shuffle2racks}
 \end{figure}
 
-\section{Performance of CIEL on different workloads using Mission Control}
-
-\subsection{Tree topology - Two racks}
-\subsection{Tree topology - Four racks}
+\begin{figure}[h!]
+        \begin{subfigure}[b]{0.49\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{q_tcp.eps}
+                \caption{TCP}
+                \label{fig:tcpq}
+        \end{subfigure}%
+        \begin{subfigure}[b]{0.49\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{q_dctcp.eps}
+                \caption{DCTCP}
+                \label{fig:dctcpq}
+        \end{subfigure}
+        \caption{Time series of receive queue length for TCP and DCTCP}
+        \label{chap:eval:sec:ciel:fig:queue}
+\end{figure}
 
 \section{Performance of Virtual Synchrony primitives}
 - Multicast time
-
-- Time taken by Mission Control to shift to a new transport
 
 - Overhead of Isis2
 
