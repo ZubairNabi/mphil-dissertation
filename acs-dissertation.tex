@@ -1257,8 +1257,26 @@ which implements a virtually synchronous version of
 Paxos~\cite{Lamport:1998:PP}.
 
 \subsubsection{Worker}\label{chap:implem:sec:ciel:subsec:workers}
-
-
+\sloppy At the worker, the implementation consists of a Throttle Controller
+instance that receives data transfer semantics from the Mission Controller. In
+particular, it distributes its total number of flows among the executing tasks.
+This number is bounded by \texttt{pycurl.M\_MAXCONNECTS} at ever host.
+In CIEL, executors in different programming languages communicate with the
+underlying framework using JavaScript Object Notation
+(JSON)\footnote{\url{http://www.json.org/}} based RPC. For instance, the methods
+in Table~\ref{chap:implem:sec:ciel:tab:task} are implemented through this
+interface. To enable the Throttle Control to allocate concurrent flows to each
+executing task, the RPC methods are extended to include a
+\texttt{Ciel.RPC.getConcurrentFilenamesForReferences} method to spawn multiple
+threads to make concurrent calls to the built-in
+\texttt{Ciel.RPC.getFilenameForReference} method. The number of these threads
+per task is equal to its concurrent flow quota. As a result, the Throttle
+Controller is able to distribute its \texttt{pycurl.M\_MAXCONNECTS} number of
+concurrent flows among the executing tasks. Moreover, on instructions from the
+Mission Controller, the Throttle Controller switches between transport protocols
+using the Linux \texttt{sysctl}\footnote{\texttt{sysctl} is used to modify
+kernel parameters at runtime.} interface.
+ 
 \chapter{Evaluation}\label{chapter:evaluation}
 This section presents a thorough evaluation of Mission Control. We first
 describe the testbed.
