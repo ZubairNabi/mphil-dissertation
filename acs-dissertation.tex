@@ -21,7 +21,7 @@
 \def\authoremail{Zubair.Nabi@cl.cam.ac.uk}
 \def\dissertationtitle{Mission Control: Enabling Efficient and Heterogeneous Data Transfers
 in Data Intensive Computing}
-\def\wordcount{13969}
+\def\wordcount{13956}
 
 
 \usepackage{epsfig,graphicx,parskip,setspace,tabularx,xspace,epstopdf,url,caption,subcaption,float,listings,color} 
@@ -115,8 +115,8 @@ centers in which user applications have wide-varying requirements and
 communication patterns. Applications range from low-latency query jobs to
 bandwidth-hungry batch processing jobs~\cite{Alizadeh:2010:DCT}. In addition,
 applications exhibit one-to-many, many-to-one, and many-to-many communication
-patterns. At the data center fabric level, to ensure better fault-tolerance,
-scalability, and end-to-end bandwidth, several new
+patterns. In order to ensure better fault-tolerance, scalability, and end-to-end
+bandwidth in data center networks, several new
 topologies~\cite{Al-Fares:2008:SCD,Guo:2008:DSF,Guo:2009:BHP,Greenberg:2009:VSF}
 have been proposed to replace the status quo: a hierarchical 2/3-level tree
 which connects end-hosts through \emph{top-of-rack} (or \emph{aggregation}), and
@@ -145,7 +145,29 @@ specifying a set of files and network destinations. In addition, frameworks can
 also expose a set of constraints, such as the use of encryption. Mission Control
 uses global information to choose an optimum policy for each data transfer. We
 have implemented Mission Control for the CIEL~\cite{Murray:2011:CUE} framework.
-Finally, we evaluate the performance of CIEL under various transport semantics.
+
+Our main contributions are the following: 
+\begin{enumerate}
+  \item Highlighting the shortcomings of TCP in the data center and
+  proposing that the solution is to have diversity at the transport layer.
+  \item The design and implementation of Mission Control, an abstraction layer
+  that chooses data transfer semantics for a particular transfer.
+  \item An evaluation of different transport protocols to show their pros and
+  cons. The evaluation suggests that there is no one-size-fits-all protocol as
+  each protocol explores a different point in the design and optimization space.
+\end{enumerate}
+
+Our evaluation shows that data transfer indeed accounts for a large chunk of the
+job completion time and can potentially become a performance bottle-neck. The
+evaluation also shows that increasing the number of concurrent data fetch flows
+at hosts can improve the transfer throughput. In addition, multi-path TCP
+enables the framework to leverage multiple paths in the network. Moreover, data
+center TCP improves job completion time by 20\% on average by keeping the TCP
+receive queue length in check but is unable to match TCP's per flow fairness.
+Furthermore, TCPcrypt can transparently encrypt data with an acceptable
+overhead. Most importantly, the evaluation corroborates our thesis that there is
+no single solution which is applicable across the board and to counter this, it
+imperative to have diversity at the transport layer.
 
 \section{The Case Against TCP in the Data Center}
 During the last 3 decades the Internet protocol stack has experienced
@@ -164,10 +186,10 @@ network layer is minimal, as it is only employed for naming and addressing. The
 only obstacle is address assignment which needs to be done manually to encode
 location/topology information within the address\footnote{DHCP can be used for
 address assignment if only physical IDs, such as MAC addresses, are used
-throughout. Advanced topologies, such as BCube, DCell, and VL2, operate on
-logical IDs, which requires an additional physical-to-logical address encoding
-at the DHCP server.}. Although manual assignment is tedious and error-prone, it
-can be automated by leveraging the well-defined structure of data
+throughout. Advanced topologies, such as BCube and VL2, operate on logical IDs,
+which requires an additional physical-to-logical address encoding at the DHCP
+server.}. Although manual assignment is tedious and error-prone, it can be
+automated by leveraging the well-defined structure of data
 centers~\cite{Chen:2010:GAA}. In contrast, TCP faces a number of pathological
 challenges due to a significantly different bandwidth-delay product, round-trip
 time (RTT), and retransmission timeout (RTO)~\cite{Chen:2009:UTI} than would be
@@ -283,29 +305,6 @@ Likewise, application traffic can transparently and
 efficiently~\cite{bittau:the} be encrypted to ensure security in a multi-tenant
 environment.
 
-Thus, our main contributions are the following: 
-\begin{enumerate}
-  \item Highlighting the shortcomings of TCP in the data center and
-  proposing that the solution is to have diversity at the transport layer.
-  \item The design and implementation of Mission Control, an abstraction layer
-  that chooses data transfer semantics for a particular transfer.
-  \item An evaluation of different transport protocols to show their pros and
-  cons. The evaluation suggests that there is no one-size-fits-all protocol as
-  each protocol explores a different point in the design and optimization space.
-\end{enumerate}
-
-Our evaluation shows that data transfer indeed accounts for a large chunk of the
-job completion time and can potentially become a performance bottle-neck. The
-evaluation also shows that increasing the number of concurrent data fetch flows
-at hosts can improve the transfer throughput. In addition, multi-path TCP
-enables the framework to leverage multiple paths in the network. Moreover, data
-center TCP improves job completion time by 20\% on average by keeping the TCP
-receive queue length in check but is unable to match TCP's per flow fairness.
-Furthermore, TCPcrypt can transparently encrypt data with an acceptable
-overhead. Most importantly, the evaluation corroborates our thesis that there is
-no single solution which is applicable across the board and to counter this, it
-imperative to have diversity at the transport layer.
-
 The rest of this document is structured as follows. \S\ref{chapter:background}
 gives an overview of the cloud computing paradigm, data intensive computing
 frameworks, and application models in the cloud. Related work is summarized in
@@ -362,8 +361,8 @@ followed by the application of the reduce function to the output of the mappers.
 The framework operates on key-value pairs. The intermediate key-value pairs,
 obtained after the map phase, are \emph{shuffled} to a set of reduce workers
 based on hash partitioning. The framework also has several optimizations such
-as: 1) Locality: input data is assigned on the basis of locality, 2)
-Fault-tolerance: failed tasks are simply rescheduled, and 3) Speculative
+as: (1) Locality: input data is assigned on the basis of locality, (2)
+Fault-tolerance: failed tasks are simply rescheduled, and (3) Speculative
 re-execution: slow executing tasks are speculatively re-executed on other nodes
 to improve the job completion time.
 
@@ -404,16 +403,16 @@ frameworks such as MapReduce, as CIEL subsumes both MapReduce and Dryad.
 Architecturally, CIEL is similar to MapReduce and Dryad, in that it also has a
 single master and several worker nodes, with the former in charge of computation
 state, and the latter in charge of the actual computation.
-CIEL relies on three primitives -- objects, references, and tasks -- for dynamic
-task graphs. Specifically, objects are data sequences that are used for input
-and are generated as output. Objects which have not been fully computed yet, can
-be used as references. Further, tasks are the unit of computation and
-scheduling. Tasks use programmatic code, or binaries to execute over all their
-dependencies. Moreover, tasks can either compute all of their output objects, or
-alternatively, spawn other tasks to do so. Tasks can be executed in either
-\emph{eager}, or \emph{lazy} fashion, with the latter being the default
-strategy. Finally, CIEL uses a number of optimizations to improve performance
-such as deterministic naming, and streaming.
+CIEL relies on three primitives -- objects, references, and tasks -- for
+defining dynamic task graphs. Specifically, objects are data sequences that are
+used for input and are generated as output. Objects which have not been fully
+computed yet, can be used as references. Further, tasks are the unit of
+computation and scheduling. Tasks use programmatic code, or binaries to execute
+over all their dependencies. Moreover, tasks can either compute all of their
+output objects, or alternatively, spawn other tasks to do so. Tasks can be
+executed in either \emph{eager}, or \emph{lazy} fashion, with the latter being
+the default strategy. Finally, CIEL uses a number of optimizations to improve
+performance such as deterministic naming, and streaming.
 Figure~\ref{chap:intro:fig:frameworks} highlights the major differences between
 the three frameworks.
 
@@ -512,8 +511,8 @@ topology is unable to cater to this need as links up the tree hierarchy are
 shared and hence, become a bottleneck. To remedy this, a number of novel
 topologies have recently been proposed.
 
-Al-Fares et al.\cite{Al-Fares:2008:SCD} present a data center architecture using
-a fat-tree topology which aims to support full-bisection bandwidth. A
+Al-Fares et al.~\cite{Al-Fares:2008:SCD} present a data center architecture
+using a fat-tree topology which aims to support full-bisection bandwidth. A
 \emph{k}-aray fat-tree enables each host and switch to have redundant links. IP
 addresses are assigned in the network based on the location of the element in
 the topology. To achieve even load balancing, a two-level routing table is
@@ -533,15 +532,16 @@ In contrast to fat-tree and VL2, DCell~\cite{Guo:2008:DSF} is a recursive,
 server-centric architecture. Each server is connected to other servers directly
 and through a small number of switches. DCells form a fully-connected graph and
 can be assembled together to form high-level DCells. Servers in DCells are
-identified by their position in the structure. Further, it uses a fault-tolerant
-single-path routing algorithm that exploits the recursive structure of the
-topology. A related architecture, BCube~\cite{Guo:2009:BHP}, is similar in
-structure but targets modular data centers~\cite{Vishwanath:2009:MDC}. Switches
-in BCube only connect servers, while servers themselves relay their traffic.
-Servers are addressed using an array based on their position, as a result
-neighbouring servers only differ by a single digit in the array. This
-information is used by source servers to encode routing information in the
-packet headers, which are in turn, used by servers for packet forwarding.
+identified by their position in the structure. Further, the architecture uses a
+fault-tolerant single-path routing algorithm that exploits the recursive
+structure of the topology. A related architecture, BCube~\cite{Guo:2009:BHP}, is
+similar in structure but targets modular data
+centers~\cite{Vishwanath:2009:MDC}. Switches in BCube only connect servers,
+while servers themselves relay their traffic. Servers are addressed using an
+array based on their position, as a result neighbouring servers only differ by a
+single digit in the array. This information is used by source servers to encode
+routing information in the packet headers, which are in turn, used by servers
+for packet forwarding.
 
 Another radical architecture is CamCube, which proposes a 3D torus topology in
 which each server is directly connected to a small set of other servers,
@@ -1048,7 +1048,7 @@ state is stored in a worker table.
 	\textbf{Reference} & \textbf{Description} \\ \hline \hline
     Future & Represents an object that has not been created yet \\ \hline
     Concrete &  For objects that have concrete values and locations \\ \hline
-    Value & Stores the actual value of small objects \\ \hline
+    Value & Stores the actual values of small objects \\ \hline
     Error & Stores the error code of failed tasks \\ \hline
     Streaming & Enables streaming data between tasks \\ \hline
     Sweetheart & Represents loop-invariant data \\ \hline
@@ -1234,13 +1234,14 @@ on the basis of application semantics. To this end, Mission Controller performs
 a breadth-first search of the dynamic task graph for each job. If the tasks in a
 stage have one reference from each task in the previous stage as a dependency,
 the stage is marked as a shuffle. In contrast, if all of the output references
-of the previous stage are dependencies of the subsequent stage, then the stage
-is marked as a broadcast. This information is then used to assign twice the
-weight of a shuffle transfer to a broadcast transfer. In addition, the current
-implementation supports four transport protocols. These protocols and their
-selection criteria is given in Table~\ref{chap:implem:sec:ciel:tab:protocols}.
-It is important to highlight that any transport protocol can easily be added to
-Mission Controller by extending the Flight Controller class.
+of the previous stage are dependencies of tasks in the subsequent stage, then
+the stage is marked as a broadcast. This information is then used to assign
+twice the weight of a shuffle transfer to a broadcast transfer. In addition, the
+current implementation supports four transport protocols. These protocols and
+their selection criteria is given in
+Table~\ref{chap:implem:sec:ciel:tab:protocols}. It is important to highlight
+that any transport protocol can easily be added to Mission Controller by
+extending the Flight Controller class.
 
 \begin{table}
   \centering
@@ -1708,13 +1709,13 @@ the shuffle time.
 In this section, we evaluate the performance of CIEL under Mission Control for a
 2 rack topology and 3 switches. Rack 1 has 21 hosts (containers) while Rack 2
 has 20 hosts (containers). Hosts within each rack are connected via a 1 Gbps
-switch each while the racks are connected via another 1 Gbps. The topology is
-shown in Figure~\ref{chap:eval:sec:ciel:fig:topology}. The master is run on a
-host in Rack 1 while the rest of the hosts in the two racks run workers. We
-evaluate the performance of our sort application for different input sizes. We
-first do the evaluation using the default TCP Flight Controller. We then repeat
-the experiment by turning on ECN in all switches. This prompts Mission
-Controller to switch to the DCTCP Flight Controller.
+switch each while the racks are connected via another 1 Gbps switch. The
+topology is shown in Figure~\ref{chap:eval:sec:ciel:fig:topology}. The master is
+run on a host in Rack 1 while the rest of the hosts in the two racks run
+workers. We evaluate the performance of our sort application for different input
+sizes. We first do the evaluation using the default TCP Flight Controller. We
+then repeat the experiment by turning on ECN in all switches. This prompts
+Mission Controller to switch to the DCTCP Flight Controller.
 Figure~\ref{chap:eval:sec:ciel:fig:shuffle2racks} plots the shuffle time for
 this experiment. On average, DCTCP results in a 9\% improvement in shuffle time.
 DCTCP aims to keep switch buffer occupancies low by reacting to the extent of
