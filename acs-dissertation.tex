@@ -21,7 +21,7 @@
 \def\authoremail{Zubair.Nabi@cl.cam.ac.uk}
 \def\dissertationtitle{Mission Control: Enabling Efficient and Heterogeneous Data Transfers
 in Data Intensive Computing}
-\def\wordcount{0}
+\def\wordcount{13969}
 
 
 \usepackage{epsfig,graphicx,parskip,setspace,tabularx,xspace,epstopdf,url,caption,subcaption,float,listings,color} 
@@ -191,12 +191,12 @@ dictated by the task with the longest shuffle time.
 \begin{figure}[h!]
   \centering
     \includegraphics[width=0.8\textwidth]{sort_fraction.eps}
-    \caption{Shuffle time as fraction of execution time for Sort}
+    \caption{Shuffle time as a fraction of execution time for Sort}
     \label{chap:introduction:fig:sort_fraction}
 \end{figure}
 
 It is important to highlight that some of these problems, stem at least in part
-from to the difference in traffic characteristics and scale between data centers
+from the difference in traffic characteristics and scale between data centers
 and other networks. In addition, unlike wide area network applications, there is
 a tight coupling between an application's usage of network, compute, and storage
 resources. In production data centers, due to the widely-varying mix of
@@ -242,7 +242,7 @@ All of these problems have even prompted large-scale deployments to abandon TCP
 altogether. For instance, Facebook~\cite{Facebook} now uses a custom UDP
 transport. Some researchers have gone to the extent of suggesting that fixing
 TCP is tantamount to ``saving the world''~\cite{Lyon:2008:TII}\footnote{Heat and
-CO$_{2}$ emissions and radioactive waste can be accounted to TCP's
+CO$_{2}$ emissions, and radioactive waste can be accounted to TCP's
 inefficiency.}. For completeness, it is worth noting that TCP was designed as a
 general transport mechanism for a wide area network (WAN)~\cite{Clark:1988:DPD}
 and has experienced near universal adoption in environments as diverse as
@@ -263,7 +263,7 @@ solution.
 It should be clear from the discussion above that the data center communication
 optimization space is wide due to the interplay of data center structure,
 traffic patterns, and application requirements. Traffic engineering that
-performs optimal routing in the data center requires global state, multipath
+performs optimal routing in the data center requires global state, multi-path
 routing, and the assumption of short-term predictability for
 adaptation~\cite{Benson:2010:CFT,Benson:2011:MFG}. Further, data intensive
 computing frameworks (DICF) work at the level of a \emph{transfer}, which is not
@@ -271,26 +271,22 @@ covered by existing solutions which operate at the flow or packet
 level~\cite{Chowdhury:2011:MDT}. Put differently, stages between DICF are
 dependent on bulk \emph{transfers} of data. These requirements suggest that
 there needs to be a decoupling between data transfer policy and mechanism.
-Therefore, in light of these requirements, this thesis presents the design,
-implementation, and evaluation of \emph{Mission Control}, an abstraction layer
-which operates between the application layer and network layer to choose the
-optimum transport protocol. Specifically, it uses runtime parameters,
-user-supplied requirements, network layout, and application semantics to
-dynamically choose the underlying transport protocol and schedule data transfer.
-The same strategy when applied at the network layer improves both
-application-level and network-level performance~\cite{Abu-Libdeh:2010:SRF}. In
-addition to improving performance, transport layer characteristics can also be
-chosen to improve energy efficiency~\cite{Heller:2010:ESE} or
-security~\cite{bittau:the}. Adding power constraints can greatly reduce the
-consumption footprint of today's data centers where the network consumes 10-20\%
-of the total power~\cite{Greenberg:2008:CCR}. Likewise, application traffic can
-transparently and efficiently~\cite{bittau:the} be encrypted to ensure security
-in a multi-tenant environment.
+Therefore, in light of these requirements, this thesis proposes application and
+network characteristics-centric data transfers. The same strategy when applied
+at the network layer improves both application-level and network-level
+performance~\cite{Abu-Libdeh:2010:SRF}. In addition to improving performance,
+transport layer characteristics can also be chosen to improve energy
+efficiency~\cite{Heller:2010:ESE} or security~\cite{bittau:the}. Adding power
+constraints can greatly reduce the consumption footprint of today's data centers
+where the network consumes 10-20\% of the total power~\cite{Greenberg:2008:CCR}.
+Likewise, application traffic can transparently and
+efficiently~\cite{bittau:the} be encrypted to ensure security in a multi-tenant
+environment.
 
 Thus, our main contributions are the following: 
 \begin{enumerate}
-  \item Highlighting the shortcomings of TCP in the data center and taking a
-  position that the solution is to have diversity at the transport layer.
+  \item Highlighting the shortcomings of TCP in the data center and
+  proposing that the solution is to have diversity at the transport layer.
   \item The design and implementation of Mission Control, an abstraction layer
   that chooses data transfer semantics for a particular transfer.
   \item An evaluation of different transport protocols to show their pros and
@@ -338,16 +334,17 @@ processing and storage. In the cloud computing model, users can buy \emph{X} as
 a service (XaaS), where X can be software, infrastructure, and platform and
 elastically increase or decrease required resources based on dynamic
 requirements. This allows the user to focus on application design without having
-to worry about system or network administration. The rise of cloud computing has
-been fuelled by the rise of ``Big Data'' and in turn, data intensive computing.
-The Cloud has become the ideal platform to store and analyze massive datasets
-generated by applications as diverse as satellite imagery and web indexing.
-Batch processing systems, such as MapReduce~\cite{Dean:2004:MSD}, are in turn
-used to compute user queries over these datasets. Finally, users can leverage
-the ``cost associativity''\footnote{Using a large number of computers for a
-short time costs the same amount as using a small number for a long time.} of
-the Cloud and the parallelism in the application to speed up the job completion
-time. Data intensive computing frameworks are the subject of the next section.
+to worry about system or network administration. The ascent of cloud computing
+has been fuelled by the rise of ``Big Data'' and in turn, data intensive
+computing. The Cloud has become the ideal platform to store and analyze massive
+datasets generated by applications as diverse as satellite imagery and web
+indexing. Batch processing systems, such as MapReduce~\cite{Dean:2004:MSD}, are
+in turn used to compute user queries over these datasets. Finally, users can
+leverage the ``cost associativity''\footnote{Using a large number of computers
+for a short time costs the same amount as using a small number for a long time.}
+of the Cloud and the parallelism in the application to speed up the job
+completion time. Data intensive computing frameworks are the subject of the next
+section.
 
 \section{Data Intensive
 Computing}\label{chapter:background:section:dataIntensive}
@@ -411,8 +408,8 @@ CIEL relies on three primitives -- objects, references, and tasks -- for dynamic
 task graphs. Specifically, objects are data sequences that are used for input
 and are generated as output. Objects which have not been fully computed yet, can
 be used as references. Further, tasks are the unit of computation and
-scheduling. Tasks use programmatic code, or binaries to execute over all its
-dependencies. Moreover, tasks can either compute all its output objects, or
+scheduling. Tasks use programmatic code, or binaries to execute over all their
+dependencies. Moreover, tasks can either compute all of their output objects, or
 alternatively, spawn other tasks to do so. Tasks can be executed in either
 \emph{eager}, or \emph{lazy} fashion, with the latter being the default
 strategy. Finally, CIEL uses a number of optimizations to improve performance
@@ -476,8 +473,8 @@ have to sacrifice one of the three. Due to the failure-prone, commodity
 infrastructure used to build distributed systems today, partition tolerance is a
 given. Therefore, systems have to make a choice between consistency and
 availability~\cite{Vogels:2009:EC}. Most cloud applications today, such as
-Amazon's Dynamo~\cite{DeCandia:2007:DAH} focus on availability resulting in weak
-consistency or \emph{eventual consistency}. This basically available, soft
+Amazon's Dynamo~\cite{DeCandia:2007:DAH} focus on availability, resulting in
+weak consistency or \emph{eventual consistency}. This basically available, soft
 state, eventually consistent (BASE)~\cite{Pritchett:2008:BAA} model enables
 applications to function even in the face of partial failure. To this end,
 applications operate on local (possibly stale) replicas, while the underlying
@@ -527,7 +524,7 @@ failure broadcast protocol is used to enable switches to route around failures.
 VL2~\cite{Greenberg:2009:VSF} also uses a fat-tree topology but requires no
 changes to the underlying L2 fabric. It uses two different addressing schemes to
 simplify virtual machine migration. Interfaces and switches use
-location-specific addresses while application use application-specific
+location-specific addresses while applications use application-specific
 addresses. The mapping between these two schemes is maintained by a replicated
 directory service. To spread traffic over the multiple links, VL2 uses both
 valiant load balancing (VLB) and equal-cost multi-path routing (ECMP).
@@ -541,7 +538,7 @@ single-path routing algorithm that exploits the recursive structure of the
 topology. A related architecture, BCube~\cite{Guo:2009:BHP}, is similar in
 structure but targets modular data centers~\cite{Vishwanath:2009:MDC}. Switches
 in BCube only connect servers, while servers themselves relay their traffic.
-Servers are addressed using an array based on its position, as a result
+Servers are addressed using an array based on their position, as a result
 neighbouring servers only differ by a single digit in the array. This
 information is used by source servers to encode routing information in the
 packet headers, which are in turn, used by servers for packet forwarding.
@@ -623,7 +620,7 @@ DevoFlow~\cite{Curtis:2011:DSF} is a modification of the Openflow architecture
 that tries to handle most flows in the data plane to achieve scalability. Hence,
 Hedera-like schedulers only need to deal with \emph{interesting} flows.
 
-MicroTE~\cite{Benson:2011:MFG} is a traffic engineering systems that adapts to
+MicroTE~\cite{Benson:2011:MFG} is a traffic engineering system that adapts to
 variation in network traffic at the granularity of a second. It consists of a
 central controller that creates a global view of traffic demands and coordinates
 scheduling using Openflow. To this end, it differentiates between predictable
@@ -689,9 +686,9 @@ bandwidth and latency for low-latency applications in a shared environment. To
 this end, it reduces network buffering by replacing queue occupancy-based
 congestion control with link utilization. It makes use of \emph{phantom queues}
 which give the illusion of draining a link at less than its actual rate.
-End-hosts employing DCTCP experience reduced transmission rate based on ECN from
-these phantom queues. This enables the overall network to trade bandwidth for
-latency.
+End-hosts employing DCTCP experience reduced transmission rates based on ECN
+from these phantom queues. This enables the overall network to trade bandwidth
+for latency.
 
 Structured Stream Transport (SST)~\cite{Ford:2007:SSN} finds the middle-ground
 between stream and datagram transmission. It implements a hierarchical and
@@ -711,13 +708,13 @@ unable to achieve full bisectional bandwidth because certain flows always
 traverse the same path. This creates hotspots in the topology, where certain
 links are oversubscribed and some are under/un-subscribed. Global flow
 controllers fail in this regard too as they are unable to scale with the number
-of flows. To remedy this, they propose the use of multipath TCP (MPTCP) to
+of flows. To remedy this, they propose the use of multi-path TCP (MPTCP) to
 establish multiple subflows over different paths between a pair of end-hosts.
 The key point is that these subflows operate under a single TCP connection. They
 argue that this ensures fairness as the fraction of the total congestion window
 for each flow is determined by its speed, i.e. the faster a flow is, the steeper
 the slope of its additive increase. This will also move traffic away from the
-most congested paths. MPTCP is supposed by Mission Control in multipath
+most congested paths. MPTCP is supposed by Mission Control in multi-path
 networks.
 
 \subsection{Incast}
@@ -902,13 +899,14 @@ TCP is adversely affected if there is packet reordering due to splitting a
 single flow across multiple links by ElasticTree.
 
 TCPcrypt is a backwards compatible enhancement to TCP that aims to efficiently
-provide encrypted communication transparently to applications~\cite{bittau:the}.
-To this end, it uses a custom key exchange protocol that leverages the TCP
-options field. Like SSL, to reduce the cost of connection setup for short-lived
-flows, it enables cryptographic state from one TCP connection to bootstrap
-subsequent ones. Even for legacy applications, it protects against passive
-eavesdropping. Additionally, TCPcrypt protects the integrity of TCP sessions,
-and defends against attacks that change their state or affect their performance.
+and transparently provide encrypted communication to
+applications~\cite{bittau:the}. To this end, it uses a custom key exchange
+protocol that leverages the TCP options field. Like SSL, to reduce the cost of
+connection setup for short-lived flows, it enables cryptographic state from one
+TCP connection to bootstrap subsequent ones. Even for legacy applications, it
+protects against passive eavesdropping. Additionally, TCPcrypt protects the
+integrity of TCP sessions, and defends against attacks that change their state
+or affect their performance.
 Finally, applications can also be made aware of the presence of TCPcrypt to
 negate redundant encryption. We use TCPcrypt as a secure transport protocol
 option in Mission Control.
@@ -925,9 +923,9 @@ specific environments for a limited number of traffic patterns. Furthermore,
 aggressive use of \emph{combiners} can only reduce traffic to a certain extent.
 Finally, rate limiters expect users to know the bandwidth requirements of their
 applications beforehand. This is impractical as the prediction of network
-traffic is non-trivial and application requirements are dynamic over the course
-of their execution. Mission Control addresses the shortcomings of all of these
-systems by enabling diversity in both transport semantics and scheduling.
+traffic is non-trivial and application requirements dynamically change over the
+course of their execution. Mission Control addresses the shortcomings of all of
+these systems by enabling diversity in both transport semantics and scheduling.
 
 \chapter{Design and Implementation}\label{chapter:designImplementation}
 In this section, we present the design and implementation of Mission Control.
@@ -937,7 +935,7 @@ We first enumerate a set of goals for Mission Control:
   \item Mission Control should work out of the box. Therefore, it should require
   no changes to network infrastructure.
   \item There is no ``one-size-fits-all'' transport for the data center.
-  Mission Control should support a range of diverse transports.
+  Accordingly, Mission Control should support a range of diverse transports.
   \item Data intensive computing frameworks, such as MapReduce require minimal
   intervention from the user. In fact, these systems have found traction because
   they can run unmodified user binaries. Mission Control should not modify the
@@ -1009,7 +1007,7 @@ transport layer protocol for a particular transfer.
 Each transfer is associated with a Flight Controller that handles transport
 specific resources. To this end, each FC implements the control plane of a
 particular transport protocol and its various parameters.
-For example, the multipath TCP FC selects the number of flows per TCP
+For example, the multi-path TCP FC selects the number of flows per TCP
 connection. Each FC is registered with the Mission Controller and receives its
 weight assignment. It is important to highlight that to change the transport
 protocol at runtime, the Mission Controller unregisters the existing FC for a
@@ -1218,12 +1216,13 @@ assigned all 10 flows.
     \hline 
     Fair & Job 2 arrives and is assigned a weight of 5 and the weight of Job
     1 is decreased to 5.\\ \hline 
-    Performance-centric & Job 1 is has a shuffle transfer while Job 2 has a
+    Performance-centric & Job 1 has a shuffle transfer while Job 2 has a
     broadcast transfer. Job 2 arrives and is assigned a weight of 7 and the
     weight of Job 1 is decreased to 3.\\
     \hline
  \end{tabularx} 
-  \caption{Example of weight assignment under different policies for 2 jobs}
+  \caption{Illustrative example of weight assignment under different policies
+  for 2 jobs}
   \label{chap:implem:sec:ciel:tab:policiesassign}
 \end{table}
 
@@ -1274,12 +1273,12 @@ through a barrier primitive called \emph{Flush}, that delays till all prior
 multicast messages have reached their destinations. Isis2 also provides a number
 of send primitives including a FIFO-ordered send as well as a \emph{SafeSend},
 which implements a virtually synchronous version of
-Paxos~\cite{Lamport:1998:PP}. Isis2 targets C\# development but can be called
-from with IronPython\footnote{\url{http://ironpython.net/}}. Therefore, to make
-use of Isis2 we first port CIEL to IronPython. In our implementation, CIEL
-workers are organized into a virtual group. The Mission Controller multicasts
-weight allocations and transport semantics to the virtual group using the Isis2
-send primitive. This enables all workers to have the same consistent view of the
+Paxos~\cite{Lamport:1998:PP}. Isis2 targets C\# development but can be used
+within IronPython\footnote{\url{http://ironpython.net/}}. Therefore, to make use
+of Isis2 we first port CIEL to IronPython. In our implementation, CIEL workers
+are organized into a virtual group. The Mission Controller multicasts weight
+allocations and transport semantics to the virtual group using the Isis2 send
+primitive. This enables all workers to have the same consistent view of the
 transport semantics. Isis2 uses a ``dynamically reconfigurable services'' model
 as a consensus mechanism known as the ORACLE. We currently run the ORACLE
 service at the master node but for large-scale deployments it would be more
@@ -1289,13 +1288,13 @@ feasible to have more than one ORACLE.
 \sloppy At the worker, the implementation consists of a Throttle Controller
 instance that receives data transfer semantics from the Mission Controller. In
 particular, it distributes its total number of flows among the executing tasks.
-This number is bounded by \texttt{pycurl.M\_MAXCONNECTS} at ever host.
+This number is bounded by \texttt{pycurl.M\_MAXCONNECTS} at every host.
 In CIEL, executors in different programming languages communicate with the
 underlying framework using JavaScript Object Notation
 (JSON)\footnote{\url{http://www.json.org/}} based RPC. For instance, the methods
 in Table~\ref{chap:implem:sec:ciel:tab:task} are implemented through this
-interface. To enable the Throttle Control to allocate concurrent flows to each
-executing task, the RPC methods are extended to include a
+interface. To enable the Throttle Controller to allocate concurrent flows to
+each executing task, the RPC methods are extended to include a
 \texttt{Ciel.RPC.getConcurrentFilenamesForReferences} method to spawn multiple
 threads to make concurrent calls to the built-in
 \texttt{Ciel.RPC.getFilenameForReference} method. The number of these threads
@@ -1303,8 +1302,8 @@ per task is equal to its concurrent flow quota. As a result, the Throttle
 Controller is able to distribute its \texttt{pycurl.M\_MAXCONNECTS} number of
 concurrent flows among the executing tasks. Moreover, on instructions from the
 Mission Controller, the Throttle Controller switches between transport protocols
-using the Linux \texttt{sysctl}\footnote{\texttt{sysctl} is used to modify
-kernel parameters at runtime.} interface.
+using the Linux \texttt{sysctl}\footnote{\texttt{sysctl} enables the
+modification of kernel parameters at runtime.} interface.
  
 \chapter{Evaluation}\label{chapter:evaluation}
 This section presents a thorough evaluation of Mission Control. We first
@@ -1317,7 +1316,7 @@ RAM, 1 TB of HDD, and 1 Gbps network connectivity. In addition, the system is
 also provisioned with a 256 GB solid state drive\footnote{We use the SSD to
 negate the effect of disk I/O on shuffle time.}.
 
-On the software side, the system is running a Debian-based Linux kernel version
+On the software side, the system runs a Debian-based Linux kernel version
 3.2.x.x. We use Linux Containers
 (LXC)\footnote{\url{http://lxc.sourceforge.net/}} for lightweight
 virtualization. 41 containers were created to host the
@@ -1495,7 +1494,7 @@ MPTCP\footnote{\url{http://mptcp.info.ucl.ac.be/}}~\cite{Raiciu:2012:HHC} as a
 representative protocol. In this experiment we benchmark the performance of our
 sort application using TCP, TCP with bonding, and MPTCP. Out setup consists of 9
 containers: 1 master and 8 workers. We vary the input dataset size between 1 GB
-and 4GB\footnote{Due to a bug in the MPTCP kernel implementation we are unable
+and 4 GB\footnote{Due to a bug in the MPTCP kernel implementation we are unable
 to scale out beyond 9 hosts.}.
 Figure~\ref{chap:eval:sec:ciel:fig:sortshufflemptcp} plots the shuffle time for
 TCP, TCP with bonding, and MPTCP. Surprisingly, MPTCP performs poorly in
@@ -1559,7 +1558,7 @@ Figure~\ref{chap:eval:sec:ciel:fig:sortres} we see that network traffic spikes
 are closely packed which results in higher throughput. This can be attributed to
 DCTCP's ability to trade convergence for higher throughput. To achieve this,
 DCTCP sources incrementally adjust their window size based on the extent of
-congestion. In contrast, TCP throughput has more variation  At the same time we
+congestion. In contrast, TCP throughput has more variation. At the same time we
 note that TCP ensures more fairness for individual flows.
 Table~\ref{chap:eval:sec:ciel:tab:jain} shows the Jain's fairness
 index~\cite{Jain:1984:AQM} for both TCP and DCTCP. TCP's fairness is on average
@@ -1678,7 +1677,7 @@ Surprisingly, the number of concurrent flows has no effect on the shuffle time.
 To find out whether this is due to the nature of the application or our
 experimental setup, we use
 \texttt{iperf}\footnote{\url{http://sourceforge.net/projects/iperf/}} to measure
-the throughput of concurrent senders . For even a small number of senders as 16,
+the throughput of concurrent senders. For even a small number of senders as 16,
 the average throughput is 140.937 Mbps, which is far below the theoretical value
 of 1 Gbps. Increasing the maximum transmission unit (MTU)\footnote{MTU is
 maximum unit of data in bytes that is passed by any layer of the network stack.}
@@ -1690,7 +1689,7 @@ Figure~\ref{chap:eval:sec:ciel:fig:shuffleflowsjumbo}. The results point to 3
 main takeaways, (1) The effect of concurrent flows comes into play when the
 receivers have to fetch more than one file from each sender, (2) Even having two
 concurrent connections substantially improves performance, (3) Beyond a certain
-point we encounter diminishing returns. In fact, due to the three point, systems
+point we encounter diminishing returns. In fact, due to the last point, systems
 such as Hadoop limit the number of concurrent flows per receiver to
 5\footnote{This limit is also set to keep the number of threads in check and
 also to mitigate incast~\cite{Chowdhury:2011:MDT}.}. This analysis proves that
@@ -1817,8 +1816,8 @@ from policy in the data center. We conclude by listing possible future work:
 	require high throughput. In addition to the systems, data centers also run
 	stream processing systems, such as S4~\cite{Neumeyer:2010:SDS} and
 	Percolator~\cite{Peng:2010:LIP}, which require low latency. The choice of
-	underlying transport semantics is completely different and Mission Control
-	would need to be made aware of these requirements.
+	underlying transport semantics for these systems is completely different and
+	Mission Control would need to be made aware of these requirements.
 	\item The last point can be generalized to a trade-off between bandwidth and
 	latency. Protocols such as HULL~\cite{Alizadeh:2012:LIM} make this trade-off
 	possible. Mission Control can be extended to use global knowledge to optimize
